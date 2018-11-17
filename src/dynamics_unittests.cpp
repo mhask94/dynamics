@@ -1,10 +1,15 @@
 #include "gtest/gtest.h"
-#include "dronenode.hpp"
-#include "rk4.hpp"
+#include "drone.hpp"
 
-TEST(a,b)
+TEST(Quadcopter,givenEquilibriumInputs_DoesNotMove)
 {
-    rk4 integrator;
+    dyn::Drone Quadcopter;
+//    Quadcopter.x = States_t{0,0,0,0,0,0,0,0,0,0,0,0};
+//    Input u{0.55,0.55,0.55,0.55};
+//    Quadcopter.propagateDynamics(u);
 
-    EXPECT_EQ(1,1);
+//    States_t expected_states{0,0,0,0,0,0,0,0,0,0,0};
+//    States_t actual_states{Quadcopter.getStates()};
+
+//    EXPECT_EQ(expected_states,actual_states);
 }
