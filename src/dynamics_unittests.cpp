@@ -1,6 +1,12 @@
 #include "gtest/gtest.h"
 #include "drone.hpp"
 
+bool expectVecNear(const dyn::xVec &a,const dyn::xVec &b,double delta)
+{
+    dyn::xVec diff = (a-b).cwiseAbs();
+    return diff.maxCoeff() < delta;
+}
+
 TEST(QuadcopterAtEquilibrium,givenEquilibriumInputs_DoesNotMove)
 {
     dyn::Drone Quadcopter;
@@ -9,9 +15,10 @@ TEST(QuadcopterAtEquilibrium,givenEquilibriumInputs_DoesNotMove)
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
+
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_EQ(expected_states,actual_states);
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.00001));
 }
 
 TEST(QuadcopterAtEquilibrium,givenAboveEquilibriumInputs_MovesUp)
@@ -22,8 +29,10 @@ TEST(QuadcopterAtEquilibrium,givenAboveEquilibriumInputs_MovesUp)
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::PZ) = 0.02232;
+    expected_states(dyn::VZ) = -0.44665;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_EQ(expected_states,actual_states);
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.00001));
 }
