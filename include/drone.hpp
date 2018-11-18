@@ -55,8 +55,8 @@ typedef struct
     double inertia_x{0.4*center_mass*est_radius*est_radius+2*prop_mass*arm_len*arm_len};
     double inertia_y{inertia_x};
     double inertia_z{0.4*center_mass*est_radius*est_radius+4*prop_mass*arm_len*arm_len};
-    Eigen::Matrix inertia = Eigen::Vector3d(inertia_x,inertia_y,inertia_z); //TODO
-    Eigen::Matrix inertia_inv = Eigen::Vector3d(1/inertia_x,1/inertia_y,1/inertia_z); //TODO
+    Eigen::Matrix3d inertia{Eigen::Vector3d(inertia_x,inertia_y,inertia_z).asDiagonal()};
+    Eigen::Matrix3d inertia_inv{Eigen::Vector3d(1/inertia_x,1/inertia_y,1/inertia_z).asDiagonal()}; //TODO
     double grav{9.81};
     double mu{0.1};
     double u_eq{0.55};
@@ -113,13 +113,14 @@ public:
     virtual ~Drone();
     void sendAttitudeCmds(const cmdVec &cmds);
     void sendMotorCmds(const uVec &inputs);
+    xVec getStates() const;
 
 private:
     params_t m_p;
     xVec m_states;
     rk4_t m_rk4;
     Eigen::Matrix3d m_att_R;
-    void derivatives(const xVec &states,const uVec &inputs,xVec &k);
+    void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
 //    cmdVec m_cmds;
 //    uVec m_inputs;
 };
