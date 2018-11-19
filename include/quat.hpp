@@ -1,8 +1,8 @@
 #ifndef QUAT_HPP
 #define QUAT_HPP
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Geometry>
 #include <math.h>
 #include <iostream>
 

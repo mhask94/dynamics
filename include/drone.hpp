@@ -1,8 +1,7 @@
 #ifndef DRONE_HPP
 #define DRONE_HPP
 
-#include <Eigen/Core>
-//#include <Eigen/Geometry>
+#include <eigen3/Eigen/Core>
 
 namespace dyn
 {
@@ -73,38 +72,6 @@ typedef struct
     xVec k4;
     double dt;
 }rk4_t;
-
-//typedef struct
-//{
-//    double pn;
-//    double pe;
-//    double pd;
-
-//    double phi;
-//    double theta;
-//    double psi;
-
-//    double u;
-//    double v;
-//    double w;
-
-//    double p;
-//    double q;
-//    double r;
-//}States;
-
-//typedef struct
-//{
-//    double u1;
-//    double u2;
-//    double u3;
-//    double u4;
-
-//    double F;
-//    double phi_c;
-//    double theta_c;
-//    double r_c;
-//}Inputs;
 
 class Drone
 {
