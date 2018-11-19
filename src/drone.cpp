@@ -49,12 +49,8 @@ void Drone::derivatives(const xVec &x,const uVec &u,xVec &k)
                                sin(x(RX))/cos(x(RY)),cos(x(RX))/cos(x(RY));
     k.segment<3>(RX) = m_att_R*x.segment<3>(WX);
 
-    double ud = x(WZ)*x(VY)-x(WY)*x(VZ) - m_p.grav*sin(x(RY)) - m_p.mu/m_p.mass*x(VX);
-    double vd = x(WX)*x(VZ)-x(WZ)*x(VX) + m_p.grav*cos(x(RY))*sin(x(RX)) - m_p.mu/m_p.mass*x(RY);
-    double wd = x(WY)*x(VX)-x(WX)*x(VY) + m_p.grav*cos(x(RY))*cos(x(RX)) - u(U1)/m_p.mass - m_p.mu/m_p.mass*x(VZ);
-
     k.segment<3>(VX) = x.segment<3>(VX).cross(x.segment<3>(WX)) + q_i2b.rotp(quat::e3*m_p.grav)
-                       - (quat::e3*u(U1) - m_p.mu*x.segment<3>(VX))/m_p.mass;
+                       - (quat::e3*u(U1) + m_p.mu*x.segment<3>(VX))/m_p.mass;
 
     k.segment<3>(WX) = m_p.inertia_inv * (u.segment<3>(U2) - x.segment<3>(WX).cross(
                        m_p.inertia*x.segment<3>(WX)));

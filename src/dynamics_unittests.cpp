@@ -32,8 +32,8 @@ TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PZ) = 2.254526;
-    expected_states(dyn::VZ) = -4.534242;
+    expected_states(dyn::PZ) = 2.204978;
+    expected_states(dyn::VZ) = -4.385592;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
@@ -89,12 +89,12 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PY) = 0.009885;
-    expected_states(dyn::VY) = 0.193499;
-    expected_states(dyn::PZ) = -0.000599;
-    expected_states(dyn::VZ) = -0.041670; //TODO should this be negative?
+    expected_states(dyn::PY) = 0.009859;
+    expected_states(dyn::VY) = 0.192859;
+    expected_states(dyn::PZ) = -0.000598;
+    expected_states(dyn::VZ) = -0.041511;
     expected_states(dyn::RX) = 0.302882;
-    expected_states(dyn::WX) = 3.028817;
+    expected_states(dyn::WX) = 3.028816;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
@@ -112,12 +112,12 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PX) = -0.009885;
-    expected_states(dyn::VX) = -0.193499;
-    expected_states(dyn::PZ) = -0.000599;
-    expected_states(dyn::VZ) = -0.041670; //TODO should this be negative?
+    expected_states(dyn::PX) = -0.009859;
+    expected_states(dyn::VX) = -0.192859;
+    expected_states(dyn::PZ) = -0.000598;
+    expected_states(dyn::VZ) = -0.041511;
     expected_states(dyn::RY) = 0.302882;
-    expected_states(dyn::WY) = 3.028817;
+    expected_states(dyn::WY) = 3.028816;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
