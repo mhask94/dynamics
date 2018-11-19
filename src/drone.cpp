@@ -11,7 +11,7 @@ Drone::Drone()
             m_p.arm_len*m_p.k1,0,-m_p.arm_len*m_p.k1,0, -m_p.k2, m_p.k2, -m_p.k2, m_p.k2;
     m_states.setZero(STATE_SIZE,1);
     m_att_R = Eigen::Matrix3d::Identity();
-    m_rk4.dt = .1;
+    m_rk4.dt = .002;
 }
 
 Drone::~Drone()
@@ -27,8 +27,8 @@ void Drone::sendMotorCmds(const uVec &inputs)
 {
     uVec force_tau{m_p.mixer*inputs};
     this->derivatives(m_states, force_tau, m_rk4.k1);
-    this->derivatives(m_states + m_rk4.dt/2*m_rk4.k1, force_tau, m_rk4.k2);
-    this->derivatives(m_states + m_rk4.dt/2*m_rk4.k2, force_tau, m_rk4.k3);
+    this->derivatives(m_states + m_rk4.dt/2.0*m_rk4.k1, force_tau, m_rk4.k2);
+    this->derivatives(m_states + m_rk4.dt/2.0*m_rk4.k2, force_tau, m_rk4.k3);
     this->derivatives(m_states + m_rk4.dt*m_rk4.k3, force_tau, m_rk4.k4);
     m_states += m_rk4.dt/6.0 * (m_rk4.k1 + 2*m_rk4.k2 + 2*m_rk4.k3 + m_rk4.k4);
 }

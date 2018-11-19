@@ -61,7 +61,7 @@ typedef struct
     double mu{0.1};
     double u_eq{0.55};
     double k1{mass*grav/(4*u_eq)};
-    double k2{0.1};
+    double k2{0.2};
     Eigen::Matrix4d mixer;
 }params_t;
 

@@ -7,10 +7,11 @@ bool expectVecNear(const dyn::xVec &a,const dyn::xVec &b,double delta)
     return diff.maxCoeff() < delta;
 }
 
-TEST(QuadcopterAtEquilibrium,givenEquilibriumInputs_DoesNotMove)
+TEST(QuadcopterAtEquilibrium,GivenEquilibriumInputs_DoesNotMove)
 {
     dyn::Drone Quadcopter;
-    dyn::uVec u{0.55,0.55,0.55,0.55};
+    double eq{0.55};
+    dyn::uVec u{eq,eq,eq,eq};
     Quadcopter.sendMotorCmds(u);
 
     dyn::xVec expected_states;
@@ -18,21 +19,61 @@ TEST(QuadcopterAtEquilibrium,givenEquilibriumInputs_DoesNotMove)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.00001));
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
 }
 
-TEST(QuadcopterAtEquilibrium,givenAboveEquilibriumInputs_MovesUp)
+TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
 {
     dyn::Drone Quadcopter;
-    dyn::uVec u{0.8,0.8,0.8,0.8};
-    Quadcopter.sendMotorCmds(u);
+    double above_eq{0.8};
+    dyn::uVec u{above_eq,above_eq,above_eq,above_eq};
+    for (int i{0}; i < 500; i++)
+        Quadcopter.sendMotorCmds(u);
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PZ) = 0.02232;
-    expected_states(dyn::VZ) = -0.44665;
+    expected_states(dyn::PZ) = 2.254526;
+    expected_states(dyn::VZ) = -4.534242;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.00001));
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+}
+
+TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
+{
+    dyn::Drone Quadcopter;
+    double eq{0.55};
+    double eq_off{0.1};
+    dyn::uVec u{eq+eq_off,eq-eq_off,eq+eq_off,eq-eq_off};
+    for (int i{0}; i < 500; i++)
+        Quadcopter.sendMotorCmds(u);
+
+    dyn::xVec expected_states;
+    expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::RZ) = -0.408163;
+    expected_states(dyn::WZ) = -0.816327;
+
+    dyn::xVec actual_states{Quadcopter.getStates()};
+
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+}
+
+TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
+{
+    dyn::Drone Quadcopter;
+    double eq{0.55};
+    double eq_off{0.1};
+    dyn::uVec u{eq-eq_off,eq+eq_off,eq-eq_off,eq+eq_off};
+    for (int i{0}; i < 500; i++)
+        Quadcopter.sendMotorCmds(u);
+
+    dyn::xVec expected_states;
+    expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::RZ) = 0.408163;
+    expected_states(dyn::WZ) = 0.816327;
+
+    dyn::xVec actual_states{Quadcopter.getStates()};
+
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
 }
