@@ -77,3 +77,49 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
 
     EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
 }
+
+TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
+{
+    dyn::Drone Quadcopter;
+    double eq{0.55};
+    double eq_off{0.1};
+    dyn::uVec u{eq,eq-eq_off,eq,eq+eq_off};
+    for (int i{0}; i < 100; i++)
+        Quadcopter.sendMotorCmds(u);
+
+    dyn::xVec expected_states;
+    expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::PY) = 0.009885;
+    expected_states(dyn::VY) = 0.193499;
+    expected_states(dyn::PZ) = -0.000599;
+    expected_states(dyn::VZ) = -0.041670; //TODO should this be negative?
+    expected_states(dyn::RX) = 0.302882;
+    expected_states(dyn::WX) = 3.028817;
+
+    dyn::xVec actual_states{Quadcopter.getStates()};
+
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+}
+
+TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
+{
+    dyn::Drone Quadcopter;
+    double eq{0.55};
+    double eq_off{0.1};
+    dyn::uVec u{eq+eq_off,eq,eq-eq_off,eq};
+    for (int i{0}; i < 100; i++)
+        Quadcopter.sendMotorCmds(u);
+
+    dyn::xVec expected_states;
+    expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::PX) = -0.009885;
+    expected_states(dyn::VX) = -0.193499;
+    expected_states(dyn::PZ) = -0.000599;
+    expected_states(dyn::VZ) = -0.041670; //TODO should this be negative?
+    expected_states(dyn::RY) = 0.302882;
+    expected_states(dyn::WY) = 3.028817;
+
+    dyn::xVec actual_states{Quadcopter.getStates()};
+
+    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+}
