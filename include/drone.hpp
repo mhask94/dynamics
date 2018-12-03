@@ -81,6 +81,8 @@ public:
     void sendAttitudeCmds(const cmdVec &cmds);
     void sendMotorCmds(const uVec &inputs);
     xVec getStates() const;
+    double getDt(const bool milli=true) const;
+    double setDt(const double dt);
 
 private:
     params_t m_p;
@@ -88,8 +90,6 @@ private:
     rk4_t m_rk4;
     Eigen::Matrix3d m_att_R;
     void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
-//    cmdVec m_cmds;
-//    uVec m_inputs;
 };
 
 } // end namespace dyn

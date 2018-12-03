@@ -38,6 +38,19 @@ xVec Drone::getStates() const
     return m_states;
 }
 
+double Drone::getDt(const bool milli) const
+{
+    if (milli)
+        return m_rk4.dt*1000;
+    else
+        return m_rk4.dt;
+}
+
+double Drone::setDt(const double dt)
+{
+    m_rk4.dt = dt;
+}
+
 void Drone::derivatives(const xVec &x,const uVec &u,xVec &k)
 {
     quat::Quatd q_i2b{quat::Quat<double>::from_euler(x(RX),x(RY),x(RZ))};
