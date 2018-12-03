@@ -83,13 +83,13 @@ public:
     xVec getStates() const;
     double getDt(const bool milli=true) const;
     double setDt(const double dt);
+    void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
 
 private:
     params_t m_p;
     xVec m_states;
     rk4_t m_rk4;
     Eigen::Matrix3d m_att_R;
-    void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
 };
 
 } // end namespace dyn
