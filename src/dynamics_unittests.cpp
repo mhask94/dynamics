@@ -1,9 +1,17 @@
 #include "gtest/gtest.h"
+#include "types.hpp"
 #include "drone.hpp"
+#include "controller.hpp"
 
-bool expectVecNear(const dyn::xVec &a,const dyn::xVec &b,double delta)
-{
-    dyn::xVec diff = (a-b).cwiseAbs();
+bool expectXVecNear(const dyn::xVec &a,const dyn::xVec &b)
+{   double delta{0.000001};
+    dyn::xVec diff{(a-b).cwiseAbs()};
+    return diff.maxCoeff() < delta;
+}
+
+bool expectUVecNear(const dyn::uVec &a,const dyn::uVec &b)
+{   double delta{0.000001};
+    dyn::uVec diff{(a-b).cwiseAbs()};
     return diff.maxCoeff() < delta;
 }
 
@@ -19,7 +27,7 @@ TEST(QuadcopterAtEquilibrium,GivenEquilibriumInputs_DoesNotMove)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
@@ -37,7 +45,7 @@ TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
@@ -56,7 +64,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
@@ -75,7 +83,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
@@ -98,7 +106,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
@@ -121,5 +129,19 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectVecNear(expected_states,actual_states,0.000001));
+    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+}
+
+TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
+{
+    Controller mpc;
+    dyn::xVec current_states;
+    current_states.setZero(dyn::STATE_SIZE,1);
+
+    double eq{0.55};
+    dyn::uVec expected_input{eq,eq,eq,eq};
+
+    dyn::uVec actual_input{mpc.calculateControl(current_states)};
+
+    EXPECT_TRUE(expectUVecNear(expected_input,actual_input));
 }

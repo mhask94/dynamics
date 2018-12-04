@@ -1,5 +1,5 @@
 #include "drone.hpp"
-#include <Eigen/Core>
+//#include <Eigen/Core>
 #include "quat.hpp"
 
 namespace dyn
@@ -10,7 +10,7 @@ Drone::Drone()
     m_p.mixer << m_p.k1,m_p.k1,m_p.k1,m_p.k1, 0,-m_p.arm_len*m_p.k1,0,m_p.arm_len*m_p.k1,
             m_p.arm_len*m_p.k1,0,-m_p.arm_len*m_p.k1,0, -m_p.k2, m_p.k2, -m_p.k2, m_p.k2;
     m_states.setZero(STATE_SIZE,1);
-    m_att_R = Eigen::Matrix3d::Identity();
+    m_att_rot = Eigen::Matrix3d::Identity();
     m_rk4.dt = .002;
 }
 
@@ -57,10 +57,10 @@ void Drone::derivatives(const xVec &x,const uVec &u,xVec &k)
     k.segment<3>(PX) = q_i2b.rota(x.segment<3>(VX));
     k(PZ) *= -1;
 
-    m_att_R.block<3,2>(0,1) << sin(x(RX))*tan(x(RY)),cos(x(RX))*tan(x(RY)),
+    m_att_rot.block<3,2>(0,1) << sin(x(RX))*tan(x(RY)),cos(x(RX))*tan(x(RY)),
                                cos(x(RX)), -sin(x(RX)),
                                sin(x(RX))/cos(x(RY)),cos(x(RX))/cos(x(RY));
-    k.segment<3>(RX) = m_att_R*x.segment<3>(WX);
+    k.segment<3>(RX) = m_att_rot*x.segment<3>(WX);
 
     k.segment<3>(VX) = x.segment<3>(VX).cross(x.segment<3>(WX)) + q_i2b.rotp(quat::e3*m_p.grav)
                        - (quat::e3*u(U1) + m_p.mu*x.segment<3>(VX))/m_p.mass;

@@ -2,16 +2,11 @@ cmake_minimum_required(VERSION 3.4)
 project(DynamicsLib)
 
 find_package(Eigen3 REQUIRED)
-#find_package(catkin REQUIRED COMPONENTS
-#    roscpp
-#    rosbag
-#    rosflight_msgs
-#    )
 
 include_directories(
     ${EIGEN3_INCLUDE_DIRS}
-#    ${catkin_INCLUDE_DIRS}
     include
+    include/3rd_party
     )
 
 set(CMAKE_CXX_STANDARD 11)
@@ -26,9 +21,12 @@ IF (NOT TARGET gtest)
 ENDIF()
 
 add_library(Dynamics STATIC
-    include/quat.hpp
+    include/3rd_party/quat.hpp
+    include/types.hpp
     include/drone.hpp
+    include/controller.hpp
     src/drone.cpp
+    src/controller.cpp
     )
 
 set(TEST_NAME ${PROJECT_NAME}_UnitTest)
