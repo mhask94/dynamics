@@ -144,4 +144,6 @@ TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
     dyn::uVec actual_input{mpc.calculateControl(current_states)};
 
     EXPECT_TRUE(expectUVecNear(expected_input,actual_input));
+
+
 }
