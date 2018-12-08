@@ -22,6 +22,11 @@ ENDIF()
 
 add_library(Dynamics STATIC
     include/3rd_party/quat.hpp
+    include/3rd_party/solver.h
+    include/3rd_party/solver.c
+    include/3rd_party/util.c
+    include/3rd_party/matrix_support.c
+    include/3rd_party/ldl.c
     include/types.hpp
     include/drone.hpp
     include/controller.hpp
