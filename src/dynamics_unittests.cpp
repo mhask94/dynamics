@@ -4,13 +4,15 @@
 #include "controller.hpp"
 
 bool expectXVecNear(const dyn::xVec &a,const dyn::xVec &b)
-{   double delta{0.000001};
+{
+    double delta{0.000001};
     dyn::xVec diff{(a-b).cwiseAbs()};
     return diff.maxCoeff() < delta;
 }
 
 bool expectUVecNear(const dyn::uVec &a,const dyn::uVec &b)
-{   double delta{0.000001};
+{
+    double delta{0.000001};
     dyn::uVec diff{(a-b).cwiseAbs()};
     return diff.maxCoeff() < delta;
 }
@@ -146,4 +148,6 @@ TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
     EXPECT_TRUE(expectUVecNear(expected_input,actual_input));
 
 
+//    dyn::MatrixA A;
+//    A.setZero();
 }
