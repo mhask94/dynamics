@@ -1,4 +1,4 @@
-#include "controller.hpp"
+﻿#include "controller.hpp"
 
 extern "C"
 {
@@ -87,7 +87,7 @@ void Controller::setConstRef(const dyn::xVec &ref)
         params.x_des_8[i] = ref[i];
         params.x_des_9[i] = ref[i];
         params.x_des_10[i] = ref[i];
-        params.x_des_11[i] = 3+ref[i];
+        params.x_des_11[i] = ref[i];
     }
 }
 
@@ -294,11 +294,145 @@ void Controller::setB(const dyn::MatrixB &B)
 //    params.B[44] = 0.0;
 //    params.B[45] = 0.0;
 //    params.B[46] = 0.0;
-//    params.B[47] = 0.999999867534023;
+    //    params.B[47] = 0.999999867534023;
+}
+
+void Controller::setStateWeights(const dyn::xVec &weights,bool final)
+{
+    for (int i{0};i < weights.rows();i++)
+    {
+        params.Wy[i] = weights[i];
+        if (final)
+            params.Wy_final[i] = weights[i];
+        else
+            params.Wy_final[i] = 0.0;
+    }
+//    params.Wy[0] = 1.5;
+//    params.Wy[1] = 1.5;
+//    params.Wy[2] = 20.0;
+//    params.Wy[3] = 1.0;
+//    params.Wy[4] = 1.0;
+//    params.Wy[5] = 5.0;
+//    params.Wy[6] = 2.0;
+//    params.Wy[7] = 2.0;
+//    params.Wy[8] = 2.0;
+//    params.Wy[9] = 50.0;
+//    params.Wy[10] = 50.0;
+//    params.Wy[11] = 1.0;
+
+//    params.Wy_final[0] = 0.0;
+//    params.Wy_final[1] = 0.0;
+//    params.Wy_final[2] = 0.0;
+//    params.Wy_final[3] = 0.0;
+//    params.Wy_final[4] = 0.0;
+//    params.Wy_final[5] = 0.0;
+//    params.Wy_final[6] = 0.0;
+//    params.Wy_final[7] = 0.0;
+//    params.Wy_final[8] = 0.0;
+//    params.Wy_final[9] = 0.0;
+//    params.Wy_final[10] = 0.0;
+//    params.Wy_final[11] = 0.0;
+}
+
+void Controller::setInputWeights(const dyn::uVec &weights)
+{
+    for (int i{0};i < weights.rows();i++)
+        params.Wu[i] = weights[i];
+//    params.Wu[0] = 1.0*0;
+//    params.Wu[1] = 1.0*0;
+//    params.Wu[2] = 1.0*0;
+    //    params.Wu[3] = 1.0*0;
+}
+
+void Controller::setEquilibriumInputs(const dyn::uVec &u_eq)
+{
+    for (int i{0};i < u_eq.rows();i++)
+    {
+        params.u_des_0[i] = u_eq[i];
+        params.u_des_1[i] = u_eq[i];
+        params.u_des_2[i] = u_eq[i];
+        params.u_des_3[i] = u_eq[i];
+        params.u_des_4[i] = u_eq[i];
+        params.u_des_5[i] = u_eq[i];
+        params.u_des_6[i] = u_eq[i];
+        params.u_des_7[i] = u_eq[i];
+        params.u_des_8[i] = u_eq[i];
+        params.u_des_9[i] = u_eq[i];
+        params.u_des_10[i] = u_eq[i];
+    }
+//    params.u_des_0[0] = 0.55;
+//    params.u_des_0[1] = 0.55;
+//    params.u_des_0[2] = 0.55;
+//    params.u_des_0[3] = 0.55;
+
+//    params.u_des_1[0] = 0.0;
+//    params.u_des_1[1] = 0.0;
+//    params.u_des_1[2] = 0.0;
+//    params.u_des_1[3] = 0.0;
+
+//    params.u_des_2[0] = 0.0;
+//    params.u_des_2[1] = 0.0;
+//    params.u_des_2[2] = 0.0;
+//    params.u_des_2[3] = 0.0;
+
+//    params.u_des_3[0] = 0.0;
+//    params.u_des_3[1] = 0.0;
+//    params.u_des_3[2] = 0.0;
+//    params.u_des_3[3] = 0.0;
+
+//    params.u_des_4[0] = 0.0;
+//    params.u_des_4[1] = 0.0;
+//    params.u_des_4[2] = 0.0;
+//    params.u_des_4[3] = 0.0;
+
+//    params.u_des_5[0] = 0.0;
+//    params.u_des_5[1] = 0.0;
+//    params.u_des_5[2] = 0.0;
+//    params.u_des_5[3] = 0.0;
+
+//    params.u_des_6[0] = 0.0;
+//    params.u_des_6[1] = 0.0;
+//    params.u_des_6[2] = 0.0;
+//    params.u_des_6[3] = 0.0;
+
+//    params.u_des_7[0] = 0.0;
+//    params.u_des_7[1] = 0.0;
+//    params.u_des_7[2] = 0.0;
+//    params.u_des_7[3] = 0.0;
+
+//    params.u_des_8[0] = 0.0;
+//    params.u_des_8[1] = 0.0;
+//    params.u_des_8[2] = 0.0;
+//    params.u_des_8[3] = 0.0;
+
+//    params.u_des_9[0] = 0.0;
+//    params.u_des_9[1] = 0.0;
+//    params.u_des_9[2] = 0.0;
+//    params.u_des_9[3] = 0.0;
+
+//    params.u_des_10[0] = 0.0;
+//    params.u_des_10[1] = 0.0;
+//    params.u_des_10[2] = 0.0;
+    //    params.u_des_10[3] = 0.0;
+}
+
+void Controller::setInputLimits(double min, double max)
+{
+    params.u_min[0] = min;
+    params.u_max[0] = max;
+//    params.u_min[0] = 0.0;
+    //    params.u_max[0] = 1.0;
+}
+
+void Controller::setSlewRate(double slew_rate)
+{
+    params.S[0] = slew_rate;
+//    params.S[0] = 0.005;
 }
 
 void Controller::updateAB()
 {
+    this->updateRotation();
     Eigen::Matrix3d down_to_height;
     down_to_height << 1,0,0, 0,1,0, 0,0,-1;
     m_A.block(dyn::PX,dyn::VX,3,3) = down_to_height*m_R_b2i;
@@ -342,95 +476,20 @@ void Controller::load_data()
     setA(A);
     setB(m_B);
 
+    dyn::xVec initial_state_weights;
+    initial_state_weights << 1.5,1.5,20,1,1,5,2,2,2,50,50,1;
+    setStateWeights(initial_state_weights);
 
-    params.Wy[0] = 1.5;
-    params.Wy[1] = 1.5;
-    params.Wy[2] = 20.0;
-    params.Wy[3] = 1.0;
-    params.Wy[4] = 1.0;
-    params.Wy[5] = 5.0;
-    params.Wy[6] = 2.0;
-    params.Wy[7] = 2.0;
-    params.Wy[8] = 2.0;
-    params.Wy[9] = 50.0;
-    params.Wy[10] = 50.0;
-    params.Wy[11] = 1.0;
+    dyn::uVec initial_input_weights;
+    initial_input_weights.setZero(dyn::INPUT_SIZE,1);
+    setInputWeights(initial_input_weights);
 
-    params.u_des_0[0] = 0.55;
-    params.u_des_0[1] = 0.55;
-    params.u_des_0[2] = 0.55;
-    params.u_des_0[3] = 0.55;
+    setEquilibriumInputs(m_p.u_eq);
 
-    params.Wu[0] = 1.0*0;
-    params.Wu[1] = 1.0*0;
-    params.Wu[2] = 1.0*0;
-    params.Wu[3] = 1.0*0;
+    double min_motor_signal{0};
+    double max_motor_signal{1};
+    setInputLimits(min_motor_signal,max_motor_signal);
 
-    params.u_des_1[0] = 0.0;
-    params.u_des_1[1] = 0.0;
-    params.u_des_1[2] = 0.0;
-    params.u_des_1[3] = 0.0;
-
-    params.u_des_2[0] = 0.0;
-    params.u_des_2[1] = 0.0;
-    params.u_des_2[2] = 0.0;
-    params.u_des_2[3] = 0.0;
-
-    params.u_des_3[0] = 0.0;
-    params.u_des_3[1] = 0.0;
-    params.u_des_3[2] = 0.0;
-    params.u_des_3[3] = 0.0;
-
-    params.u_des_4[0] = 0.0;
-    params.u_des_4[1] = 0.0;
-    params.u_des_4[2] = 0.0;
-    params.u_des_4[3] = 0.0;
-
-    params.u_des_5[0] = 0.0;
-    params.u_des_5[1] = 0.0;
-    params.u_des_5[2] = 0.0;
-    params.u_des_5[3] = 0.0;
-
-    params.u_des_6[0] = 0.0;
-    params.u_des_6[1] = 0.0;
-    params.u_des_6[2] = 0.0;
-    params.u_des_6[3] = 0.0;
-
-    params.u_des_7[0] = 0.0;
-    params.u_des_7[1] = 0.0;
-    params.u_des_7[2] = 0.0;
-    params.u_des_7[3] = 0.0;
-
-    params.u_des_8[0] = 0.0;
-    params.u_des_8[1] = 0.0;
-    params.u_des_8[2] = 0.0;
-    params.u_des_8[3] = 0.0;
-
-    params.u_des_9[0] = 0.0;
-    params.u_des_9[1] = 0.0;
-    params.u_des_9[2] = 0.0;
-    params.u_des_9[3] = 0.0;
-
-    params.u_des_10[0] = 0.0;
-    params.u_des_10[1] = 0.0;
-    params.u_des_10[2] = 0.0;
-    params.u_des_10[3] = 0.0;
-
-    params.Wy_final[0] = 0.0;
-    params.Wy_final[1] = 0.0;
-    params.Wy_final[2] = 0.0;
-    params.Wy_final[3] = 0.0;
-    params.Wy_final[4] = 0.0;
-    params.Wy_final[5] = 0.0;
-    params.Wy_final[6] = 0.0;
-    params.Wy_final[7] = 0.0;
-    params.Wy_final[8] = 0.0;
-    params.Wy_final[9] = 0.0;
-    params.Wy_final[10] = 0.0;
-    params.Wy_final[11] = 0.0;
-
-    params.u_min[0] = 0.0;
-    params.u_max[0] = 1.0;
-
-    params.S[0] = 0.005;
+    double initial_slew_rate{0.005};
+    setSlewRate(initial_slew_rate);
 }

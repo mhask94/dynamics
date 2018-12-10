@@ -17,6 +17,11 @@ protected:
     void setConstRef(const dyn::xVec &ref);
     void setA(const dyn::MatrixA &A);
     void setB(const dyn::MatrixB &B);
+    void setStateWeights(const dyn::xVec &weights,bool final=false);
+    void setInputWeights(const dyn::uVec &weights);
+    void setEquilibriumInputs(const dyn::uVec &u_eq);
+    void setInputLimits(double min,double max);
+    void setSlewRate(double slew_rate);
     void updateAB();
     void updateRotation();
     void load_data();
