@@ -13,20 +13,21 @@ public:
     dyn::MatrixA getA() const;
     dyn::MatrixA getAd() const;
     dyn::MatrixB getBd() const;
+    void setConstRef(const dyn::xVec &ref);
+    void setStateWeights(const dyn::xVec &weights,bool final=false);
+    void setInputWeights(const dyn::uVec &weights);
+    void setSlewRate(double slew_rate);
 
 protected:
     void initializeA();
     void initializeB();
-    void setX0(const dyn::xVec &x0);
-    void setConstRef(const dyn::xVec &ref);
-    void setA(const dyn::MatrixA &A);
-    void setB(const dyn::MatrixB &B);
-    void setStateWeights(const dyn::xVec &weights,bool final=false);
-    void setInputWeights(const dyn::uVec &weights);
-    void setEquilibriumInputs(const dyn::uVec &u_eq);
-    void setInputLimits(double min,double max);
-    void setSlewRate(double slew_rate);
+    void setX0();
+    void setA();
+    void setB();
+    void setEquilibriumInputs();
+    void setInputLimits();
     void linearizeAboutCurrentAttitude();
+    void setOptimizationWeights();
     void updateRotation();
     void updateA();
     void discretizeAB();

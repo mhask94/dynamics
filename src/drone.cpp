@@ -1,5 +1,4 @@
 #include "drone.hpp"
-//#include <Eigen/Core>
 #include "quat.hpp"
 
 namespace dyn
@@ -8,8 +7,6 @@ namespace dyn
 Drone::Drone()
 {
     m_p.setMixer();
-//    m_p.mixer << m_p.k1,m_p.k1,m_p.k1,m_p.k1, 0,-m_p.arm_len*m_p.k1,0,m_p.arm_len*m_p.k1,
-//            m_p.arm_len*m_p.k1,0,-m_p.arm_len*m_p.k1,0, -m_p.k2, m_p.k2, -m_p.k2, m_p.k2;
     m_states.setZero(STATE_SIZE,1);
     m_att_rot = Eigen::Matrix3d::Identity();
     m_rk4.dt = .002;
