@@ -3,50 +3,12 @@
 #include "drone.hpp"
 #include "controller.hpp"
 
-//template <typename Derived>
-//bool expectEigenNear(const Eigen::EigenBase<Derived> &mat1,const Eigen::EigenBase<Derived> &mat2)
-//{
-//    if (mat1.rows()!=mat2.rows() && mat1.cols()!=mat2.cols())
-//        return false;
-//    double delta{0.000001};
-//    Eigen::Matrix<double,mat1.rows(),mat1.cols()> M1{mat1};
-//    Eigen::Matrix<double,mat1.rows(),mat1.cols()> M2{mat2};
-//    Eigen::Matrix<double,mat1.rows(),mat1.cols()> diff{(M1-M2).cwiseAbs()};
-//    return diff.maxCoeff() < delta;
-//}
-
-bool expectXVecNear(const dyn::xVec &a,const dyn::xVec &b)
+template <typename Derived>
+bool expectEigenNear(const Eigen::MatrixBase<Derived> &mat1,const Eigen::MatrixBase<Derived> &mat2,double delta)
 {
-    double delta{0.000001};
-    dyn::xVec diff{(a-b).cwiseAbs()};
-    return diff.maxCoeff() < delta;
-}
-
-bool expectUVecNear(const dyn::uVec &a,const dyn::uVec &b)
-{
-    double delta{0.0001};
-    dyn::uVec diff{(a-b).cwiseAbs()};
-    return diff.maxCoeff() < delta;
-}
-
-bool expectRotMatrixNear(const dyn::RotMatrix &R1,const dyn::RotMatrix &R2)
-{
-    double delta{0.000001};
-    dyn::RotMatrix diff{(R1-R2).cwiseAbs()};
-    return diff.maxCoeff() < delta;
-}
-
-bool expectMatrixANear(const dyn::MatrixA &A1,const dyn::MatrixA &A2)
-{
-    double delta{0.000001};
-    dyn::MatrixA diff{(A1-A2).cwiseAbs()};
-    return diff.maxCoeff() < delta;
-}
-
-bool expectMatrixBNear(const dyn::MatrixB &B1,const dyn::MatrixB &B2)
-{
-    double delta{0.000001};
-    dyn::MatrixB diff{(B1-B2).cwiseAbs()};
+    if (mat1.rows()!=mat2.rows() && mat1.cols()!=mat2.cols())
+        return false;
+    Derived diff{(mat1-mat2).cwiseAbs()};
     return diff.maxCoeff() < delta;
 }
 
@@ -62,7 +24,7 @@ TEST(QuadcopterAtEquilibrium,GivenEquilibriumInputs_DoesNotMove)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
@@ -80,7 +42,7 @@ TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
@@ -99,7 +61,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
@@ -118,7 +80,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
@@ -141,7 +103,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
@@ -164,7 +126,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
-    EXPECT_TRUE(expectXVecNear(expected_states,actual_states));
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
 class ControllerTestFixture : public Controller, public ::testing::Test
@@ -195,7 +157,7 @@ TEST_F(ControllerTestFixture,AskedToUpdateRotation_UpdatesCorrectly)
 
     dyn::RotMatrix actual_rotation{this->getRotation()};
 
-    EXPECT_TRUE(expectRotMatrixNear(expected_rotation,actual_rotation));
+    EXPECT_TRUE(expectEigenNear(expected_rotation,actual_rotation,1e-6));
 }
 
 TEST_F(ControllerTestFixture,AskedToUpdateA_UpdatesCorrectly)
@@ -218,7 +180,7 @@ TEST_F(ControllerTestFixture,AskedToUpdateA_UpdatesCorrectly)
 
     dyn::MatrixA actual_A{this->getA()};
 
-    EXPECT_TRUE(expectMatrixANear(expected_A,actual_A));
+    EXPECT_TRUE(expectEigenNear(expected_A,actual_A,1e-6));
 }
 
 TEST_F(ControllerTestFixture,AskedToDiscretizeAandB_DiscretizesCorrectly)
@@ -258,8 +220,8 @@ TEST_F(ControllerTestFixture,AskedToDiscretizeAandB_DiscretizesCorrectly)
     dyn::MatrixA actual_Ad{this->getAd()};
     dyn::MatrixB actual_Bd{this->getBd()};
 
-    EXPECT_TRUE(expectMatrixANear(expected_Ad,actual_Ad));
-    EXPECT_TRUE(expectMatrixBNear(expected_Bd,actual_Bd));
+    EXPECT_TRUE(expectEigenNear(expected_Ad,actual_Ad,1e-6));
+    EXPECT_TRUE(expectEigenNear(expected_Bd,actual_Bd,1e-6));
 
 }
 
@@ -274,5 +236,5 @@ TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
 
     dyn::uVec actual_input{mpc.calculateControl(current_states)};
 
-    EXPECT_TRUE(expectUVecNear(expected_input,actual_input));
+    EXPECT_TRUE(expectEigenNear(expected_input,actual_input,1e-4));
 }

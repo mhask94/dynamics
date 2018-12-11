@@ -9,7 +9,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 /* Uncomment the next line to remove all library dependencies. */
-/*#define ZERO_LIBRARY_MODE */
+#define ZERO_LIBRARY_MODE
 #ifdef MATLAB_MEX_FILE
 /* Matlab functions. MATLAB_MEX_FILE will be defined by the mex compiler. */
 /* If you are not using the mex compiler, this functionality will not intrude, */

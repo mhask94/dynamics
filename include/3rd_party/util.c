@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <math.h>
 long global_seed = 1;
+#ifndef ZERO_LIBRARY_MODE
 static clock_t tic_timestart;
 void tic(void) {
   tic_timestart = clock();
@@ -39,6 +40,7 @@ void printmatrix(char *name, double *A, int m, int n, int sparse) {
   }
   printf("];\n");
 }
+#endif
 double unif(double lower, double upper) {
   return lower + ((upper - lower)*rand())/RAND_MAX;
 }

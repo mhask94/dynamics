@@ -31,7 +31,8 @@ protected:
     void updateRotation();
     void updateA();
     void discretizeAB();
-    void load_data();
+    void InitializeSolverData();
+    void setSolverSettings();
     dyn::xVec m_x;
 
 private:

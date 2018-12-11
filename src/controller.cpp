@@ -19,7 +19,7 @@ Controller::Controller()
     this->initializeA();
     this->initializeB();
     this->linearizeAboutCurrentAttitude();
-    load_data();
+    this->InitializeSolverData();
     set_defaults();
     setup_indexing();
 }
@@ -222,15 +222,24 @@ void Controller::discretizeAB()
     m_Bd = m_rate*(Eigen::MatrixXd::Identity(dyn::STATE_SIZE,dyn::STATE_SIZE)+m_A*m_rate/2+m_A*m_A*m_rate*m_rate/6+m_A*m_A*m_A*m_rate*m_rate*m_rate/24)*m_B;
 }
 
-void Controller::load_data()
+void Controller::InitializeSolverData()
 {
-    setX0();
-    setConstRef(m_ref);
-    linearizeAboutCurrentAttitude();
-    setOptimizationWeights();
-    setEquilibriumInputs();
-    setInputLimits();
+    this->setX0();
+    this->setConstRef(m_ref);
+    this->linearizeAboutCurrentAttitude();
+    this->setOptimizationWeights();
+    this->setEquilibriumInputs();
+    this->setInputLimits();
 
     double initial_slew_rate{0.005};
-    setSlewRate(initial_slew_rate);
+    this->setSlewRate(initial_slew_rate);
+    this->setSolverSettings();
+}
+
+void Controller::setSolverSettings()
+{
+    settings.verbose = 0;
+    settings.max_iters = 25;
+    settings.eps = 1e-6;
+    settings.resid_tol = 1e-4;
 }
