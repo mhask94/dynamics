@@ -1,4 +1,5 @@
 ﻿#include "controller.hpp"
+#include <unsupported/Eigen/MatrixFunctions>
 
 extern "C"
 {
@@ -11,6 +12,7 @@ Settings settings;
 
 Controller::Controller()
 {
+    m_rate = 0.01;
     m_p.setMixer();
     m_x.setZero(dyn::STATE_SIZE,1);
     m_ref.setZero(dyn::STATE_SIZE,1);
@@ -18,7 +20,7 @@ Controller::Controller()
     this->initializeA();
     this->initializeB();
 //    m_R_b2i << 1,0,0, 0,1,0, 0,0,1;
-    this->updateAB();
+    this->linearizeAboutCurrentAttitude();
     load_data();
     set_defaults();
     setup_indexing();
@@ -34,10 +36,30 @@ dyn::uVec Controller::calculateControl(const dyn::xVec &states)
     double u_equilibrium{0.55};
     dyn::uVec inputs{u_equilibrium,u_equilibrium,u_equilibrium,u_equilibrium};
 
-    int num_iters;
-    num_iters = solve();
+//    int num_iters;
+//    num_iters = solve();
 
     return inputs;
+}
+
+dyn::RotMatrix Controller::getRotation() const
+{
+    return m_R_b2i;
+}
+
+dyn::MatrixA Controller::getA() const
+{
+    return m_A;
+}
+
+dyn::MatrixA Controller::getAd() const
+{
+    return m_Ad;
+}
+
+dyn::MatrixB Controller::getBd() const
+{
+    return m_Bd;
 }
 
 void Controller::initializeA()
@@ -60,9 +82,9 @@ void Controller::initializeB()
 {
     m_B.setZero(dyn::STATE_SIZE,dyn::INPUT_SIZE);
     m_B(8,0) = -1/m_p.mass;
-    m_B(9,1) = -1/m_p.inertia_x;
-    m_B(10,2) = -1/m_p.inertia_y;
-    m_B(11,3) = -1/m_p.inertia_z;
+    m_B(9,1) = 1/m_p.inertia_x;
+    m_B(10,2) = 1/m_p.inertia_y;
+    m_B(11,3) = 1/m_p.inertia_z;
     m_B.block(8,0,4,4) *= m_p.mixer;
 }
 
@@ -430,13 +452,13 @@ void Controller::setSlewRate(double slew_rate)
 //    params.S[0] = 0.005;
 }
 
-void Controller::updateAB()
+void Controller::linearizeAboutCurrentAttitude()
 {
     this->updateRotation();
-    Eigen::Matrix3d down_to_height;
-    down_to_height << 1,0,0, 0,1,0, 0,0,-1;
-    m_A.block(dyn::PX,dyn::VX,3,3) = down_to_height*m_R_b2i;
-    // TODO - Finish function
+    this->updateA();
+    this->discretizeAB();
+    this->setA(m_Ad);
+    this->setB(m_Bd);
 }
 
 void Controller::updateRotation()
@@ -453,6 +475,22 @@ void Controller::updateRotation()
     m_R_b2i(2,0) = -sin(pitch);
     m_R_b2i(2,1) = sin(roll)*cos(pitch);
     m_R_b2i(2,2) = cos(roll)*cos(pitch);
+}
+
+void Controller::updateA()
+{
+    Eigen::Matrix3d down_to_height;
+    down_to_height << 1,0,0, 0,1,0, 0,0,-1;
+    m_A.block(dyn::PX,dyn::VX,3,3) = down_to_height*m_R_b2i;
+    m_A.block(dyn::VX,dyn::RX,3,3) << 0,-m_p.grav*cos(m_x(dyn::RY)),0,
+                                      m_p.grav*cos(m_x(dyn::RY))*cos(m_x(dyn::RX)),-m_p.grav*sin(m_x(dyn::RY))*sin(m_x(dyn::RX)),0,
+                                     -m_p.grav*cos(m_x(dyn::RY))*sin(m_x(dyn::RX)),-m_p.grav*sin(m_x(dyn::RY))*cos(m_x(dyn::RX)),0;
+}
+
+void Controller::discretizeAB()
+{
+    m_Ad = (m_A*m_rate).exp();
+    m_Bd = m_rate*(Eigen::MatrixXd::Identity(dyn::STATE_SIZE,dyn::STATE_SIZE)+m_A*m_rate/2+m_A*m_A*m_rate*m_rate/6+m_A*m_A*m_A*m_rate*m_rate*m_rate/24)*m_B;
 }
 
 void Controller::load_data()
@@ -475,6 +513,7 @@ void Controller::load_data()
 
     setA(A);
     setB(m_B);
+    linearizeAboutCurrentAttitude();
 
     dyn::xVec initial_state_weights;
     initial_state_weights << 1.5,1.5,20,1,1,5,2,2,2,50,50,1;

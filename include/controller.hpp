@@ -9,6 +9,10 @@ public:
     Controller();
     virtual ~Controller();
     dyn::uVec calculateControl(const dyn::xVec &states);
+    dyn::RotMatrix getRotation() const;
+    dyn::MatrixA getA() const;
+    dyn::MatrixA getAd() const;
+    dyn::MatrixB getBd() const;
 
 protected:
     void initializeA();
@@ -22,13 +26,16 @@ protected:
     void setEquilibriumInputs(const dyn::uVec &u_eq);
     void setInputLimits(double min,double max);
     void setSlewRate(double slew_rate);
-    void updateAB();
+    void linearizeAboutCurrentAttitude();
     void updateRotation();
+    void updateA();
+    void discretizeAB();
     void load_data();
+    dyn::xVec m_x;
 
 private:
+    double m_rate;
     dyn::params_t m_p;
-    dyn::xVec m_x;
     dyn::xVec m_ref;
     dyn::uVec m_u;
     dyn::MatrixA m_A;
