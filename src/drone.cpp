@@ -16,12 +16,12 @@ Drone::~Drone()
 {
 }
 
-void Drone::sendAttitudeCmds(const cmdVec &cmds)
+void Drone::sendAttitudeCmds(const cmdVec& cmds)
 {
 
 }
 
-void Drone::sendMotorCmds(const uVec &inputs)
+void Drone::sendMotorCmds(const uVec& inputs)
 {
     uVec force_tau{m_p.mixer*inputs};
     this->derivatives(m_states, force_tau, m_rk4.k1);
@@ -54,7 +54,7 @@ double Drone::setDt(const double dt)
     m_rk4.dt = dt;
 }
 
-void Drone::derivatives(const xVec &x,const uVec &u,xVec &k)
+void Drone::derivatives(const xVec& x,const uVec& u,xVec& k)
 {
     quat::Quatd q_i2b{quat::Quatd::from_euler(x(RX),x(RY),x(RZ))};
     k.segment<3>(PX) = q_i2b.rota(x.segment<3>(VX));
