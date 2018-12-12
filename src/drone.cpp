@@ -36,6 +36,11 @@ xVec Drone::getStates() const
     return m_states;
 }
 
+uVec Drone::getEquilibriumInputs() const
+{
+    return m_p.u_eq;
+}
+
 double Drone::getDt(const bool milli) const
 {
     if (milli)

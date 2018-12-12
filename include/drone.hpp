@@ -14,6 +14,7 @@ public:
     void sendAttitudeCmds(const cmdVec &cmds);
     void sendMotorCmds(const uVec &inputs);
     xVec getStates() const;
+    uVec getEquilibriumInputs() const;
     double getDt(const bool milli=true) const;
     double setDt(const double dt);
     void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
