@@ -102,13 +102,13 @@ void Controller::initializeB()
 
 void Controller::setSolverX0()
 {
-    for (int i{0};i < m_x.rows();i++)
+    for (int i{0};i < dyn::STATE_SIZE;i++)
         params.x_0[i] = m_x[i];
 }
 
 void Controller::setSolverConstRef()
 {
-    for (int i{0};i < m_ref.rows();i++)
+    for (int i{0};i < dyn::STATE_SIZE;i++)
     {
         params.x_des_0[i] = m_ref[i];
         params.x_des_1[i] = m_ref[i];
@@ -145,15 +145,15 @@ void Controller::setSolverInputWeights()
 
 void Controller::setSolverA()
 {
-    for (int j{0};j<m_Ad.cols();j++)
-        for (int i{0};i<m_Ad.rows();i++)
+    for (int j{0};j < m_Ad.cols();j++)
+        for (int i{0};i < m_Ad.rows();i++)
             params.A[i+j*m_Ad.rows()] = m_Ad(i,j);
 }
 
 void Controller::setSolverB()
 {
-    for (int j{0};j<m_Bd.cols();j++)
-        for (int i{0};i<m_Bd.rows();i++)
+    for (int j{0};j < m_Bd.cols();j++)
+        for (int i{0};i < m_Bd.rows();i++)
             params.B[i+j*m_Bd.rows()] = m_Bd(i,j);
 }
 
@@ -188,7 +188,7 @@ void Controller::updateSolverParams()
 
 void Controller::setSolverEquilibriumInputs()
 {
-    for (int i{0};i < m_p.u_eq.rows();i++)
+    for (int i{0};i < dyn::INPUT_SIZE;i++)
     {
         params.u_des_0[i] = m_p.u_eq[i];
         params.u_des_1[i] = m_p.u_eq[i];

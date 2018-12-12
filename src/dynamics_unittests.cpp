@@ -199,7 +199,6 @@ TEST_F(ControllerTestFixture,AskedToDiscretizeAandB_DiscretizesCorrectly)
 
     EXPECT_TRUE(expectEigenNear(expected_Ad,actual_Ad,1e-6));
     EXPECT_TRUE(expectEigenNear(expected_Bd,actual_Bd,1e-6));
-
 }
 
 TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
