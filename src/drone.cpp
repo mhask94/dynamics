@@ -51,7 +51,7 @@ double Drone::setDt(const double dt)
 
 void Drone::derivatives(const xVec &x,const uVec &u,xVec &k)
 {
-    quat::Quatd q_i2b{quat::Quat<double>::from_euler(x(RX),x(RY),x(RZ))};
+    quat::Quatd q_i2b{quat::Quatd::from_euler(x(RX),x(RY),x(RZ))};
     k.segment<3>(PX) = q_i2b.rota(x.segment<3>(VX));
     k(PZ) *= -1;
 

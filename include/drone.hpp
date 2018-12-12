@@ -7,7 +7,7 @@ namespace dyn
 {
 
 class Drone
-{
+{   
 public:
     Drone();
     virtual ~Drone();
@@ -19,6 +19,15 @@ public:
     void derivatives(const xVec &getStates,const uVec &inputs,xVec &k);
 
 private:
+    typedef struct
+    {
+        xVec k1;
+        xVec k2;
+        xVec k3;
+        xVec k4;
+        double dt;
+    } rk4_t;
+
     params_t m_p;
     xVec m_states;
     rk4_t m_rk4;

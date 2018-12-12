@@ -4,10 +4,15 @@ extern "C"
 {
 #include "solver.h"
 }
+// These global variables are required for 3rd party code
 Vars vars;
 Params params;
 Workspace work;
 Settings settings;
+// End of global variable for 3rd party code
+
+namespace dyn
+{
 
 Controller::Controller()
 {
@@ -15,7 +20,6 @@ Controller::Controller()
     m_p.setMixer();
     m_x.setZero(dyn::STATE_SIZE,1);
     m_ref.setZero(dyn::STATE_SIZE,1);
-    m_u = m_p.u_eq;
     this->initializeA();
     this->initializeB();
     this->linearizeAboutCurrentAttitude();
@@ -243,3 +247,5 @@ void Controller::setSolverSettings()
     settings.eps = 1e-6;
     settings.resid_tol = 1e-4;
 }
+
+} //end namespace dyn

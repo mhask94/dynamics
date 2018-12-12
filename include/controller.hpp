@@ -3,6 +3,9 @@
 
 #include "types.hpp"
 
+namespace dyn
+{
+
 class Controller
 {
 public:
@@ -39,7 +42,6 @@ private:
     double m_rate;
     dyn::params_t m_p;
     dyn::xVec m_ref;
-    dyn::uVec m_u;
     dyn::MatrixA m_A;
     dyn::MatrixA m_Ad;
     dyn::MatrixB m_B;
@@ -47,4 +49,5 @@ private:
     dyn::RotMatrix m_R_b2i;
 };
 
+} //end namespace dyn
 #endif // CONTROLLER_HPP

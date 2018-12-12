@@ -12,33 +12,70 @@ bool expectEigenNear(const Eigen::MatrixBase<Derived> &mat1,const Eigen::MatrixB
     return diff.maxCoeff() < delta;
 }
 
-TEST(QuadcopterAtEquilibrium,GivenEquilibriumInputs_DoesNotMove)
+class DroneTestFixture : public dyn::Drone, public ::testing::Test
 {
-    dyn::Drone Quadcopter;
-    double eq{0.55};
-    dyn::uVec u{eq,eq,eq,eq};
-    Quadcopter.sendMotorCmds(u);
+public:
+    DroneTestFixture()
+    {
+        m_eq_offset.setZero(dyn::INPUT_SIZE,1);
+        m_expected_states.setZero(dyn::STATE_SIZE,1);
+    }
+
+    void runSimulation(int steps)
+    {
+        for (int i{0}; i < steps; i++)
+            m_quadcopter.sendMotorCmds(m_p.u_eq+m_eq_offset);
+    }
+
+    dyn::Drone m_quadcopter;
+    dyn::uVec m_eq_offset;
+    dyn::xVec m_expected_states;
+
+private:
+    dyn::params_t m_p;
+};
+
+TEST_F(DroneTestFixture,GivenEquilibriumInputsWhenAtEquilibrium_DoesNotMove)
+{
+    int steps{1};
+    this->runSimulation(steps);
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
 
-    dyn::xVec actual_states{Quadcopter.getStates()};
+    dyn::xVec actual_states{m_quadcopter.getStates()};
 
     EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
-TEST(QuadcopterAtEquilibrium,GivenAboveEquilibriumInputs_MovesUp)
+TEST_F(DroneTestFixture,GivenAboveEquilibriumInputsWhenAtEquilibrium_MovesUp)
 {
-    dyn::Drone Quadcopter;
-    double above_eq{0.8};
-    dyn::uVec u{above_eq,above_eq,above_eq,above_eq};
-    for (int i{0}; i < 500; i++)
-        Quadcopter.sendMotorCmds(u);
+    int steps{500};
+    double offset{.25};
+    m_eq_offset << offset,offset,offset,offset;
+    this->runSimulation(steps);
 
     dyn::xVec expected_states;
     expected_states.setZero(dyn::STATE_SIZE,1);
     expected_states(dyn::PZ) = 2.204978;
     expected_states(dyn::VZ) = -4.385592;
+
+    dyn::xVec actual_states{m_quadcopter.getStates()};
+
+    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+}
+
+TEST_F(DroneTestFixture,GivenInputsToYawCCWWhenAtEquilibrium_YawsCCW)
+{
+    int steps{500};
+    double off{0.1};
+    m_eq_offset << off,-off,off,-off;
+    this->runSimulation(steps);
+
+    dyn::xVec expected_states;
+    expected_states.setZero(dyn::STATE_SIZE,1);
+    expected_states(dyn::RZ) = -0.408163;
+    expected_states(dyn::WZ) = -0.816327;
 
     dyn::xVec actual_states{Quadcopter.getStates()};
 
@@ -129,7 +166,7 @@ TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
     EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
 }
 
-class ControllerTestFixture : public Controller, public ::testing::Test
+class ControllerTestFixture : public dyn::Controller, public ::testing::Test
 {
 public:
     ControllerTestFixture()
@@ -227,7 +264,7 @@ TEST_F(ControllerTestFixture,AskedToDiscretizeAandB_DiscretizesCorrectly)
 
 TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
 {
-    Controller mpc;
+    dyn::Controller mpc;
     dyn::xVec current_states;
     current_states.setZero(dyn::STATE_SIZE,1);
 

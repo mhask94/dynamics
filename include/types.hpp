@@ -49,37 +49,28 @@ typedef Eigen::Matrix<double,STATE_SIZE,INPUT_SIZE> MatrixB;
 
 typedef struct
 {
-    xVec k1;
-    xVec k2;
-    xVec k3;
-    xVec k4;
-    double dt;
-} rk4_t;
-
-typedef struct
-{
-    double center_mass{2.0};
-    double prop_mass{0.25};
-    double mass{center_mass+4*prop_mass};
-    double arm_len{0.3};
-    double est_radius{0.1};
-    double inertia_x{0.4*center_mass*est_radius*est_radius+2*prop_mass*arm_len*arm_len};
-    double inertia_y{inertia_x};
-    double inertia_z{0.4*center_mass*est_radius*est_radius+4*prop_mass*arm_len*arm_len};
-    Eigen::Matrix3d inertia{Eigen::Vector3d(inertia_x,inertia_y,inertia_z).asDiagonal()};
+    const double center_mass{2.0};
+    const double prop_mass{0.25};
+    const double mass{center_mass+4*prop_mass};
+    const double arm_len{0.3};
+    const double est_radius{0.1};
+    const double inertia_x{0.4*center_mass*est_radius*est_radius+2*prop_mass*arm_len*arm_len};
+    const double inertia_y{inertia_x};
+    const double inertia_z{0.4*center_mass*est_radius*est_radius+4*prop_mass*arm_len*arm_len};
     Eigen::Matrix3d inertia_inv{Eigen::Vector3d(1/inertia_x,1/inertia_y,1/inertia_z).asDiagonal()};
-    double grav{9.81};
-    double mu{0.1};
-    double throttle_eq{0.55};
+    Eigen::Matrix3d inertia{Eigen::Vector3d(inertia_x,inertia_y,inertia_z).asDiagonal()};
+    const double grav{9.81};
+    const double mu{0.1};
+    const double throttle_eq{0.55};
     uVec u_eq{throttle_eq,throttle_eq,throttle_eq,throttle_eq};
-    double k1{mass*grav/(4*throttle_eq)};
-    double k2{0.2};
+    const double k1{mass*grav/(4*throttle_eq)};
+    const double k2{0.2};
     Eigen::Matrix4d mixer;
     void setMixer()
     {
         mixer << k1,k1,k1,k1, 0,-arm_len*k1,0,arm_len*k1, arm_len*k1,0,-arm_len*k1,0, -k2, k2, -k2, k2;
     }
-} params_t;
+} params_t; //TODO can give a better name
 
 } // end namespace dyn
 
