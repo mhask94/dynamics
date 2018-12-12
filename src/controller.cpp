@@ -9,7 +9,7 @@ Vars vars;
 Params params;
 Workspace work;
 Settings settings;
-// End of global variable for 3rd party code
+// End of global variables for 3rd party code
 
 namespace dyn
 {

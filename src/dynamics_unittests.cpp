@@ -25,11 +25,14 @@ public:
     {
         for (int i{0}; i < steps; i++)
             m_quadcopter.sendMotorCmds(m_p.u_eq+m_eq_offset);
+
+        m_actual_states = m_quadcopter.getStates();
     }
 
     dyn::Drone m_quadcopter;
     dyn::uVec m_eq_offset;
     dyn::xVec m_expected_states;
+    dyn::xVec m_actual_states;
 
 private:
     dyn::params_t m_p;
@@ -40,12 +43,7 @@ TEST_F(DroneTestFixture,GivenEquilibriumInputsWhenAtEquilibrium_DoesNotMove)
     int steps{1};
     this->runSimulation(steps);
 
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-
-    dyn::xVec actual_states{m_quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
 TEST_F(DroneTestFixture,GivenAboveEquilibriumInputsWhenAtEquilibrium_MovesUp)
@@ -55,14 +53,10 @@ TEST_F(DroneTestFixture,GivenAboveEquilibriumInputsWhenAtEquilibrium_MovesUp)
     m_eq_offset << offset,offset,offset,offset;
     this->runSimulation(steps);
 
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PZ) = 2.204978;
-    expected_states(dyn::VZ) = -4.385592;
+    m_expected_states(dyn::PZ) = 2.204978;
+    m_expected_states(dyn::VZ) = -4.385592;
 
-    dyn::xVec actual_states{m_quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
 TEST_F(DroneTestFixture,GivenInputsToYawCCWWhenAtEquilibrium_YawsCCW)
@@ -72,75 +66,40 @@ TEST_F(DroneTestFixture,GivenInputsToYawCCWWhenAtEquilibrium_YawsCCW)
     m_eq_offset << off,-off,off,-off;
     this->runSimulation(steps);
 
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::RZ) = -0.408163;
-    expected_states(dyn::WZ) = -0.816327;
+    m_expected_states(dyn::RZ) = -0.408163;
+    m_expected_states(dyn::WZ) = -0.816327;
 
-    dyn::xVec actual_states{Quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
-TEST(QuadcopterAtEquilibrium,GivenInputsToYawCCW_YawsCCW)
+TEST_F(DroneTestFixture,GivenInputsToYawCWWhenAtEquilibrium_YawsCW)
 {
-    dyn::Drone Quadcopter;
-    double eq{0.55};
-    double eq_off{0.1};
-    dyn::uVec u{eq+eq_off,eq-eq_off,eq+eq_off,eq-eq_off};
-    for (int i{0}; i < 500; i++)
-        Quadcopter.sendMotorCmds(u);
+    int steps{500};
+    double off{0.1};
+    m_eq_offset << -off,off,-off,off;
+    this->runSimulation(steps);
 
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::RZ) = -0.408163;
-    expected_states(dyn::WZ) = -0.816327;
+    m_expected_states(dyn::RZ) = 0.408163;
+    m_expected_states(dyn::WZ) = 0.816327;
 
-    dyn::xVec actual_states{Quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
-TEST(QuadcopterAtEquilibrium,GivenInputsToYawCW_YawsCW)
+TEST_F(DroneTestFixture,GivenInputsToRollWhenAtEquilibrium_Rolls)
 {
-    dyn::Drone Quadcopter;
-    double eq{0.55};
-    double eq_off{0.1};
-    dyn::uVec u{eq-eq_off,eq+eq_off,eq-eq_off,eq+eq_off};
-    for (int i{0}; i < 500; i++)
-        Quadcopter.sendMotorCmds(u);
+    int steps{100};
+    double off{0.1};
+    m_eq_offset << 0,-off,0,off;
+    this->runSimulation(steps);
 
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::RZ) = 0.408163;
-    expected_states(dyn::WZ) = 0.816327;
+    m_expected_states(dyn::PY) = 0.009859;
+    m_expected_states(dyn::VY) = 0.192859;
+    m_expected_states(dyn::PZ) = -0.000598;
+    m_expected_states(dyn::VZ) = -0.041511;
+    m_expected_states(dyn::RX) = 0.302882;
+    m_expected_states(dyn::WX) = 3.028816;
 
-    dyn::xVec actual_states{Quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
-}
-
-TEST(QuadcopterAtEquilibrium,GivenInputsToRoll_Rolls)
-{
-    dyn::Drone Quadcopter;
-    double eq{0.55};
-    double eq_off{0.1};
-    dyn::uVec u{eq,eq-eq_off,eq,eq+eq_off};
-    for (int i{0}; i < 100; i++)
-        Quadcopter.sendMotorCmds(u);
-
-    dyn::xVec expected_states;
-    expected_states.setZero(dyn::STATE_SIZE,1);
-    expected_states(dyn::PY) = 0.009859;
-    expected_states(dyn::VY) = 0.192859;
-    expected_states(dyn::PZ) = -0.000598;
-    expected_states(dyn::VZ) = -0.041511;
-    expected_states(dyn::RX) = 0.302882;
-    expected_states(dyn::WX) = 3.028816;
-
-    dyn::xVec actual_states{Quadcopter.getStates()};
-
-    EXPECT_TRUE(expectEigenNear(expected_states,actual_states,1e-6));
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
 TEST(QuadcopterAtEquilibrium,GivenInputsToPitch_Pitches)
