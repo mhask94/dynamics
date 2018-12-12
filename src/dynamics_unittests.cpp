@@ -207,11 +207,13 @@ TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
     dyn::Controller mpc;
     dyn::xVec current_states;
     current_states.setZero(dyn::STATE_SIZE,1);
+    mpc.setX(current_states);
+    mpc.setConstRef(current_states);
 
     double eq{0.55};
     dyn::uVec expected_input{eq,eq,eq,eq};
 
-    dyn::uVec actual_input{mpc.calculateControl(current_states)};
+    dyn::uVec actual_input{mpc.calculateControl()};
 
     EXPECT_TRUE(expectEigenNear(expected_input,actual_input,1e-4));
 }

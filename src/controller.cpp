@@ -16,14 +16,15 @@ namespace dyn
 
 Controller::Controller()
 {
-    m_rate = 0.01;
     m_p.setMixer();
     m_x.setZero(dyn::STATE_SIZE,1);
     m_ref.setZero(dyn::STATE_SIZE,1);
+    this->setDefaultTuningParams();
     this->initializeA();
     this->initializeB();
     this->linearizeAboutCurrentAttitude();
-    this->InitializeSolverData();
+    this->InitializeSolverParams();
+    this->setSolverSettings();
     set_defaults();
     setup_indexing();
 }
@@ -32,8 +33,10 @@ Controller::~Controller()
 {
 }
 
-dyn::uVec Controller::calculateControl(const dyn::xVec &states)
+dyn::uVec Controller::calculateControl()
 {
+    this->updateSolverParams();
+
     int num_iters;
     num_iters = solve();
 
@@ -59,6 +62,16 @@ dyn::MatrixA Controller::getAd() const
 dyn::MatrixB Controller::getBd() const
 {
     return m_Bd;
+}
+
+void Controller::setX(const xVec& x)
+{
+    m_x = x;
+}
+
+void Controller::setConstRef(const dyn::xVec &ref)
+{
+    m_ref = ref;
 }
 
 void Controller::initializeA()
@@ -87,15 +100,14 @@ void Controller::initializeB()
     m_B.block(8,0,4,4) *= m_p.mixer;
 }
 
-void Controller::setX0()
+void Controller::setSolverX0()
 {
     for (int i{0};i < m_x.rows();i++)
         params.x_0[i] = m_x[i];
 }
 
-void Controller::setConstRef(const dyn::xVec &ref)
+void Controller::setSolverConstRef()
 {
-    m_ref = ref;
     for (int i{0};i < m_ref.rows();i++)
     {
         params.x_des_0[i] = m_ref[i];
@@ -113,39 +125,68 @@ void Controller::setConstRef(const dyn::xVec &ref)
     }
 }
 
-void Controller::setA()
+void Controller::setSolverStateWeights(bool final)
+{
+    for (int i{0};i < dyn::STATE_SIZE;i++)
+    {
+        params.Wy[i] = m_state_weights[i];
+        if (final)
+            params.Wy_final[i] = m_state_weights[i];
+        else
+            params.Wy_final[i] = 0.0;
+    }
+}
+
+void Controller::setSolverInputWeights()
+{
+    for (int i{0};i < dyn::INPUT_SIZE;i++)
+        params.Wu[i] = m_input_weights[i];
+}
+
+void Controller::setSolverA()
 {
     for (int j{0};j<m_Ad.cols();j++)
         for (int i{0};i<m_Ad.rows();i++)
             params.A[i+j*m_Ad.rows()] = m_Ad(i,j);
 }
 
-void Controller::setB()
+void Controller::setSolverB()
 {
     for (int j{0};j<m_Bd.cols();j++)
         for (int i{0};i<m_Bd.rows();i++)
             params.B[i+j*m_Bd.rows()] = m_Bd(i,j);
 }
 
-void Controller::setStateWeights(const dyn::xVec &weights,bool final)
+void Controller::setStateWeights(const dyn::xVec& weights,bool final)
 {
-    for (int i{0};i < weights.rows();i++)
-    {
-        params.Wy[i] = weights[i];
-        if (final)
-            params.Wy_final[i] = weights[i];
-        else
-            params.Wy_final[i] = 0.0;
-    }
+    m_state_weights = weights;
+    setSolverStateWeights(final);
 }
 
-void Controller::setInputWeights(const dyn::uVec &weights)
+void Controller::setInputWeights(const dyn::uVec& weights)
 {
-    for (int i{0};i < weights.rows();i++)
-        params.Wu[i] = weights[i];
+    m_input_weights = weights;
+    setSolverInputWeights();
 }
 
-void Controller::setEquilibriumInputs()
+void Controller::setDefaultTuningParams()
+{
+    m_rate = 0.01;
+    m_slew_rate = 0.005;
+    setSolverSlewRate();
+    m_state_weights << 10,10,100, 2.5,2.5,2, .8,.8,1, 0.1,0.1,0.1;
+    m_input_weights.setZero(dyn::INPUT_SIZE,1);
+    setSolverWeights();
+}
+
+void Controller::updateSolverParams()
+{
+    this->setSolverX0();
+    this->setSolverConstRef();
+    this->linearizeAboutCurrentAttitude();
+}
+
+void Controller::setSolverEquilibriumInputs()
 {
     for (int i{0};i < m_p.u_eq.rows();i++)
     {
@@ -163,15 +204,15 @@ void Controller::setEquilibriumInputs()
     }
 }
 
-void Controller::setInputLimits()
+void Controller::setSolverInputLimits()
 {
     params.u_min[0] = 0.0;
     params.u_max[0] = 1.0;
 }
 
-void Controller::setSlewRate(double slew_rate)
+void Controller::setSolverSlewRate()
 {
-    params.S[0] = slew_rate;
+    params.S[0] = m_slew_rate;
 }
 
 void Controller::linearizeAboutCurrentAttitude()
@@ -179,19 +220,14 @@ void Controller::linearizeAboutCurrentAttitude()
     this->updateRotation();
     this->updateA();
     this->discretizeAB();
-    this->setA();
-    this->setB();
+    this->setSolverA();
+    this->setSolverB();
 }
 
-void Controller::setOptimizationWeights()
+void Controller::setSolverWeights()
 {
-    dyn::xVec initial_state_weights;
-    initial_state_weights << 1.5,1.5,20,1,1,5,2,2,2,50,50,1;
-    setStateWeights(initial_state_weights);
-
-    dyn::uVec initial_input_weights;
-    initial_input_weights.setZero(dyn::INPUT_SIZE,1);
-    setInputWeights(initial_input_weights);
+    setSolverStateWeights();
+    setSolverInputWeights();
 }
 
 void Controller::updateRotation()
@@ -226,18 +262,15 @@ void Controller::discretizeAB()
     m_Bd = m_rate*(Eigen::MatrixXd::Identity(dyn::STATE_SIZE,dyn::STATE_SIZE)+m_A*m_rate/2+m_A*m_A*m_rate*m_rate/6+m_A*m_A*m_A*m_rate*m_rate*m_rate/24)*m_B;
 }
 
-void Controller::InitializeSolverData()
+void Controller::InitializeSolverParams()
 {
-    this->setX0();
-    this->setConstRef(m_ref);
+    this->setSolverX0();
+    this->setSolverConstRef();
     this->linearizeAboutCurrentAttitude();
-    this->setOptimizationWeights();
-    this->setEquilibriumInputs();
-    this->setInputLimits();
-
-    double initial_slew_rate{0.005};
-    this->setSlewRate(initial_slew_rate);
-    this->setSolverSettings();
+    this->setSolverWeights();
+    this->setSolverInputLimits();
+    this->setSolverSlewRate();
+    this->setSolverEquilibriumInputs();
 }
 
 void Controller::setSolverSettings()
