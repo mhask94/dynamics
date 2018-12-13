@@ -64,6 +64,11 @@ dyn::MatrixB Controller::getBd() const
     return m_Bd;
 }
 
+uVec Controller::getEquilibriumInputs() const
+{
+    return m_p.u_eq;
+}
+
 void Controller::setX(const xVec& x)
 {
     m_x = x;

@@ -16,6 +16,7 @@ public:
     dyn::MatrixA getA() const;
     dyn::MatrixA getAd() const;
     dyn::MatrixB getBd() const;
+    dyn::uVec getEquilibriumInputs() const;
     void setX(const dyn::xVec& x);
     void setConstRef(const dyn::xVec& ref);
     void setStateWeights(const dyn::xVec& weights,bool final=false);

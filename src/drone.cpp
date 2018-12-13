@@ -72,4 +72,9 @@ void Drone::derivatives(const xVec& x,const uVec& u,xVec& k)
                        m_p.inertia*x.segment<3>(WX)));
 }
 
+void Drone::resetStates()
+{
+    m_states.setZero(dyn::STATE_SIZE,1);
+}
+
 } //end namespace dyn

@@ -18,6 +18,7 @@ public:
     double getDt(const bool milli=true) const;
     double setDt(const double dt);
     void derivatives(const xVec& getStates,const uVec& inputs,xVec& k);
+    void resetStates();
 
 private:
     typedef struct
