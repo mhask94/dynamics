@@ -18,7 +18,7 @@ Drone::~Drone()
 
 void Drone::sendAttitudeCmds(const cmdVec& cmds)
 {
-
+    // I am going to include this later as part of my research
 }
 
 void Drone::sendMotorCmds(const uVec& inputs)
