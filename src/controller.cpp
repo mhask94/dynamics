@@ -174,6 +174,19 @@ void Controller::setInputWeights(const dyn::uVec& weights)
     setSolverInputWeights();
 }
 
+void Controller::setControlRate(double rate, bool hz)
+{
+    if (hz)
+        m_rate = 1.0/rate;
+    else
+        m_rate = rate;
+}
+
+void Controller::setSlewRate(double slew_rate)
+{
+    m_slew_rate = slew_rate;
+}
+
 void Controller::setDefaultTuningParams()
 {
     m_rate = 0.01;

@@ -21,6 +21,7 @@ public:
     void setConstRef(const dyn::xVec& ref);
     void setStateWeights(const dyn::xVec& weights,bool final=false);
     void setInputWeights(const dyn::uVec& weights);
+    void setControlRate(double rate,bool hz=false);
     void setSlewRate(double slew_rate);
     void setDefaultTuningParams();
 
