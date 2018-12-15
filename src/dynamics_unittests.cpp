@@ -12,6 +12,51 @@ bool expectEigenNear(const Eigen::MatrixBase<Derived> &mat1,const Eigen::MatrixB
     return diff.maxCoeff() < delta;
 }
 
+class DroneProtectedFunctionTester : public dyn::Drone
+{
+public:
+    DroneProtectedFunctionTester() {}
+    dyn::xVec findDerivatives()
+    {
+        dyn::xVec state_derivatives;
+        this->derivatives(m_states,m_force_torque,state_derivatives);
+        return state_derivatives;
+    }
+
+    dyn::xVec m_states;
+    dyn::uVec m_force_torque;
+    dyn::params_t m_p;
+};
+
+TEST(DroneProtectedFunctionTester,AskedToTakeDerivatesAtEquilibrium_ReturnsZero)
+{
+    DroneProtectedFunctionTester quadcopter;
+    quadcopter.m_states.setZero(dyn::STATE_SIZE,1);
+    quadcopter.m_force_torque << quadcopter.m_p.mass*quadcopter.m_p.grav,0,0,0;
+    dyn::xVec actual_derivatives{quadcopter.findDerivatives()};
+
+    dyn::xVec expected_derivatives;
+    expected_derivatives.setZero(dyn::STATE_SIZE,1);
+
+    EXPECT_EQ(expected_derivatives,actual_derivatives);
+}
+
+TEST(DroneProtectedFunctionTester,AskedToTakeDerivatesWithRandomStatesAndInputs_ReturnsCorrectDerivates)
+{
+    DroneProtectedFunctionTester quadcopter;
+    quadcopter.m_states << -4.75,3.8,5,0.25,-0.2,1,1.2,-2.1,0,0.1,-0.1,0.3;
+    quadcopter.m_force_torque << 15.9,1.2,-1.2,1.54;
+    dyn::xVec actual_derivatives{quadcopter.findDerivatives()};
+
+    dyn::xVec expected_derivatives;
+    expected_derivatives << 2.403362,-0.022869,0.270789,
+                            0.046093,-0.171112,0.271342,
+                            1.278946,2.088654,4.105563,
+                            22.666981,-22.616038,15.714286;
+
+    EXPECT_TRUE(expectEigenNear(expected_derivatives,actual_derivatives,1e-6));
+}
+
 class DroneTestFixture : public dyn::Drone, public ::testing::Test
 {
 public:
@@ -59,7 +104,20 @@ TEST_F(DroneTestFixture,GivenAboveEquilibriumInputsWhenAtEquilibrium_MovesUp)
     EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
-TEST_F(DroneTestFixture,GivenInputsToYawWhenAtEquilibrium_Yaws)
+TEST_F(DroneTestFixture,GivenZeroInputsWhenAtEquilibrium_FallsDown)
+{
+    int steps{50};
+    double offset{-0.55};
+    m_eq_offset << offset,offset,offset,offset;
+    this->runSimulation(steps);
+
+    m_expected_states(dyn::PZ) = -0.048996;
+    m_expected_states(dyn::VZ) = 0.979367;
+
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
+}
+
+TEST_F(DroneTestFixture,GivenInputsToYawPositiveWhenAtEquilibrium_YawsPositive)
 {
     int steps{500};
     double off{0.1};
@@ -72,7 +130,20 @@ TEST_F(DroneTestFixture,GivenInputsToYawWhenAtEquilibrium_Yaws)
     EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
-TEST_F(DroneTestFixture,GivenInputsToRollWhenAtEquilibrium_Rolls)
+TEST_F(DroneTestFixture,GivenInputsToYawNegativeWhenAtEquilibrium_YawsNegative)
+{
+    int steps{500};
+    double off{0.1};
+    m_eq_offset << off,-off,off,-off;
+    this->runSimulation(steps);
+
+    m_expected_states(dyn::RZ) = -0.408163;
+    m_expected_states(dyn::WZ) = -0.816327;
+
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
+}
+
+TEST_F(DroneTestFixture,GivenInputsToRollPositiveWhenAtEquilibrium_RollsPositive)
 {
     int steps{100};
     double off{0.1};
@@ -89,7 +160,24 @@ TEST_F(DroneTestFixture,GivenInputsToRollWhenAtEquilibrium_Rolls)
     EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
 
-TEST_F(DroneTestFixture,GivenInputsToPitchWhenAtEquilibrium_Pitches)
+TEST_F(DroneTestFixture,GivenInputsToRollNegativeWhenAtEquilibrium_RollsNegative)
+{
+    int steps{100};
+    double off{0.1};
+    m_eq_offset << 0,off,0,-off;
+    this->runSimulation(steps);
+
+    m_expected_states(dyn::PY) = -0.009859;
+    m_expected_states(dyn::VY) = -0.192859;
+    m_expected_states(dyn::PZ) = -0.000598;
+    m_expected_states(dyn::VZ) = -0.041511;
+    m_expected_states(dyn::RX) = -0.302882;
+    m_expected_states(dyn::WX) = -3.028816;
+
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
+}
+
+TEST_F(DroneTestFixture,GivenInputsToPitchPositiveWhenAtEquilibrium_PitchesPositive)
 {
     int steps{100};
     double off{0.1};
@@ -102,6 +190,23 @@ TEST_F(DroneTestFixture,GivenInputsToPitchWhenAtEquilibrium_Pitches)
     m_expected_states(dyn::VZ) = -0.041511;
     m_expected_states(dyn::RY) = 0.302882;
     m_expected_states(dyn::WY) = 3.028816;
+
+    EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
+}
+
+TEST_F(DroneTestFixture,GivenInputsToPitchNegativeWhenAtEquilibrium_PitchesNegative)
+{
+    int steps{100};
+    double off{0.1};
+    m_eq_offset << -off,0,off,0;
+    this->runSimulation(steps);
+
+    m_expected_states(dyn::PX) = 0.009859;
+    m_expected_states(dyn::VX) = 0.192859;
+    m_expected_states(dyn::PZ) = -0.000598;
+    m_expected_states(dyn::VZ) = -0.041511;
+    m_expected_states(dyn::RY) = -0.302882;
+    m_expected_states(dyn::WY) = -3.028816;
 
     EXPECT_TRUE(expectEigenNear(m_expected_states,m_actual_states,1e-6));
 }
@@ -201,18 +306,57 @@ TEST_F(ControllerTestFixture,AskedToDiscretizeAandB_DiscretizesCorrectly)
     EXPECT_TRUE(expectEigenNear(expected_Bd,actual_Bd,1e-6));
 }
 
-TEST(Controller,GivenCurrentStates_SendsEquilibriumCommands)
+class ControllerTester : public ::testing::Test
 {
-    dyn::Controller mpc;
-    dyn::xVec current_states;
-    current_states.setZero(dyn::STATE_SIZE,1);
-    mpc.setX(current_states);
-    mpc.setConstRef(current_states);
+public:
+    ControllerTester() {}
+    void runController()
+    {
+        m_mpc.setX(m_current_states);
+        m_mpc.setConstRef(m_ref);
+        m_actual_input = m_mpc.calculateControl();
+    }
+
+    dyn::Controller m_mpc;
+    dyn::xVec m_current_states;
+    dyn::xVec m_ref;
+    dyn::uVec m_actual_input;
+};
+
+TEST_F(ControllerTester,AskedToCalculateControlWhenAtRefCmd_ReturnsEquilibriumCommands)
+{
+    m_current_states.setZero(dyn::STATE_SIZE,1);
+    m_ref.setZero(dyn::STATE_SIZE,1);
+    runController();
 
     double eq{0.55};
     dyn::uVec expected_input{eq,eq,eq,eq};
 
-    dyn::uVec actual_input{mpc.calculateControl()};
+    EXPECT_TRUE(expectEigenNear(expected_input,m_actual_input,1e-4));
+}
 
-    EXPECT_TRUE(expectEigenNear(expected_input,actual_input,1e-4));
+TEST_F(ControllerTester,AskedToCalculateControlWithPositiveHeightRefCmd_ReturnsFullThrottleCommands)
+{
+    m_current_states.setZero(dyn::STATE_SIZE,1);
+    m_ref.setZero(dyn::STATE_SIZE,1);
+    m_ref(dyn::PZ,0) = 5;
+    runController();
+
+    double motor_cmd{1.0};
+    dyn::uVec expected_input{motor_cmd,motor_cmd,motor_cmd,motor_cmd};
+
+    EXPECT_TRUE(expectEigenNear(expected_input,m_actual_input,1e-4));
+}
+
+TEST_F(ControllerTester,AskedToCalculateControlWithNegativeHeightRefCmd_ReturnsZeroThrottleCommands)
+{
+    m_current_states.setZero(dyn::STATE_SIZE,1);
+    m_ref.setZero(dyn::STATE_SIZE,1);
+    m_ref(dyn::PZ,0) = -5;
+    runController();
+
+    double motor_cmd{0};
+    dyn::uVec expected_input{motor_cmd,motor_cmd,motor_cmd,motor_cmd};
+
+    EXPECT_TRUE(expectEigenNear(expected_input,m_actual_input,1e-4));
 }
