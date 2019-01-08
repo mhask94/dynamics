@@ -10,6 +10,16 @@ Drone::Drone()
     m_states.setZero(STATE_SIZE,1);
     m_att_rot = Eigen::Matrix3d::Identity();
     m_rk4.dt = .002;
+    m_roll.P = 10;
+    m_roll.I = 0;
+    m_roll.D = 0;
+    m_pitch.P = 10;
+    m_pitch.I = 0;
+    m_pitch.D = 0;
+    m_yaw_rate.P = 10;
+    m_yaw_rate.I = 0;
+    m_yaw_rate.D = 0;
+    // TODO add PID gains for inner loop
 }
 
 Drone::~Drone()
@@ -18,6 +28,13 @@ Drone::~Drone()
 
 void Drone::sendAttitudeCmds(const cmdVec& cmds)
 {
+    uVec inputs;
+    inputs << cmds(THRUST),
+                    m_roll.P*(cmds(ROLL_C)-m_states(RX)) - m_roll.D*m_states(WX),
+                    m_pitch.P*(cmds(PITCH_C)-m_states(RY)) - m_pitch.D*m_states(WY),
+                    m_yaw_rate.P*(cmds(YAW_RATE_C)-m_states(RZ)) - m_yaw_rate.D*m_states(WZ);
+    inputs = m_p.mixer_qr.solve(inputs);
+    sendMotorCmds(inputs);
     // I am going to include this later as part of my research
 }
 

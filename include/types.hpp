@@ -2,6 +2,7 @@
 #define TYPES_HPP
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 
 namespace dyn
 {
@@ -66,9 +67,11 @@ typedef struct
     const double k1{mass*grav/(4*throttle_eq)};
     const double k2{0.2};
     Eigen::Matrix4d mixer;
+    Eigen::ColPivHouseholderQR<Eigen::Matrix4d> mixer_qr{4,4};
     void setMixer()
     {
         mixer << k1,k1,k1,k1, 0,-arm_len*k1,0,arm_len*k1, arm_len*k1,0,-arm_len*k1,0, -k2, k2, -k2, k2;
+        mixer_qr.compute(mixer);
     }
 } params_t; //TODO can give a better name
 

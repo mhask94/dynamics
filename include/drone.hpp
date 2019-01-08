@@ -31,11 +31,20 @@ private:
         xVec k4;
         double dt;
     } rk4_t;
+    typedef struct
+    {
+        double P;
+        double I;
+        double D;
+    } pid_t;
 
     params_t m_p;
     xVec m_states;
     rk4_t m_rk4;
     Eigen::Matrix3d m_att_rot;
+    pid_t m_roll;
+    pid_t m_pitch;
+    pid_t m_yaw_rate;
 };
 
 } // end namespace dyn
