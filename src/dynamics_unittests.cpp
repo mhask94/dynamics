@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "types.hpp"
+#include "params.hpp"
 #include "drone.hpp"
 #include "controller.hpp"
 
@@ -25,7 +26,7 @@ public:
 
     dyn::xVec m_states;
     dyn::uVec m_force_torque;
-    dyn::params_t m_p;
+    quadcopter::Params m_p;
 };
 
 TEST(DroneProtectedFunctionTester,AskedToTakeDerivatesAtEquilibrium_ReturnsZero)
@@ -80,7 +81,7 @@ public:
     dyn::xVec m_actual_states;
 
 private:
-    dyn::params_t m_p;
+    quadcopter::Params m_p;
 };
 
 TEST_F(DroneTestFixture,GivenEquilibriumInputsWhenAtEquilibrium_DoesNotMove)

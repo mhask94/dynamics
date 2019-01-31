@@ -2,6 +2,7 @@
 #define DRONE_HPP
 
 #include "types.hpp"
+#include "params.hpp"
 
 namespace dyn
 {
@@ -16,11 +17,11 @@ public:
     xVec getStates() const;
     uVec getEquilibriumInputs() const;
     double getDt(const bool milli=true) const;
-    double setDt(const double dt);
+    void setDt(const double dt);
     void resetStates();
 
 protected:
-    void derivatives(const xVec& getStates,const uVec& inputs,xVec& k);
+    void derivatives(const xVec& states,const uVec& inputs,xVec& k);
 
 private:
     typedef struct
@@ -38,7 +39,8 @@ private:
         double D;
     } pid_t;
 
-    params_t m_p;
+    quadcopter::Params m_p;
+//    params_t m_p;
     xVec m_states;
     rk4_t m_rk4;
     Eigen::Matrix3d m_att_rot;

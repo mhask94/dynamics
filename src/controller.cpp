@@ -16,7 +16,6 @@ namespace dyn
 
 Controller::Controller()
 {
-    m_p.setMixer();
     m_x.setZero(dyn::STATE_SIZE,1);
     m_ref.setZero(dyn::STATE_SIZE,1);
     this->setDefaultTuningParams();
@@ -37,7 +36,7 @@ dyn::uVec Controller::calculateControl()
 {
     this->updateSolverParams();
 
-    int num_iters;
+    long num_iters;
     num_iters = solve();
 
     dyn::uVec inputs{vars.u_0[0],vars.u_0[1],vars.u_0[2],vars.u_0[3]};

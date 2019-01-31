@@ -22,10 +22,15 @@ add_library(Dynamics STATIC
     include/3rd_party/matrix_support.c
     include/3rd_party/ldl.c
     include/types.hpp
+    include/params.hpp
+    include/fixedwing.hpp
     include/drone.hpp
     include/controller.hpp
+    include/dynamics.hpp
+    src/fixedwing.cpp
     src/drone.cpp
     src/controller.cpp
+    src/dynamics.cpp
     )
 
 if (${GTEST_FOUND})

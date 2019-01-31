@@ -2,6 +2,7 @@
 #define CONTROLLER_HPP
 
 #include "types.hpp"
+#include "params.hpp"
 
 namespace dyn
 {
@@ -50,7 +51,8 @@ protected:
 private:
     double m_rate;
     double m_slew_rate;
-    dyn::params_t m_p;
+    quadcopter::Params m_p;
+//    dyn::params_t m_p;
     dyn::xVec m_ref;
     dyn::xVec m_state_weights;
     dyn::uVec m_input_weights;

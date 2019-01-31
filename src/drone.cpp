@@ -6,7 +6,6 @@ namespace dyn
 
 Drone::Drone()
 {
-    m_p.setMixer();
     m_states.setZero(STATE_SIZE,1);
     m_att_rot = Eigen::Matrix3d::Identity();
     m_rk4.dt = .002;
@@ -66,7 +65,7 @@ double Drone::getDt(const bool milli) const
         return m_rk4.dt;
 }
 
-double Drone::setDt(const double dt)
+void Drone::setDt(const double dt)
 {
     m_rk4.dt = dt;
 }
