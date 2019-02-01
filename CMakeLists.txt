@@ -9,11 +9,15 @@ if (NOT TARGET geometry)
     include_directories(lib/geometry/include)
 endif()
 
-include_directories(
+set(DYNAMICS_INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIRS}
     include
     lib/cvxgen
     lib/geometry/include
+    )
+
+include_directories(
+    ${DYNAMICS_INCLUDE_DIRS}
     )
 
 set(CMAKE_CXX_STANDARD 11)
