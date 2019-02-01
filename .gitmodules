@@ -1,3 +1,3 @@
 [submodule "lib/geometry"]
-	path = lib/geometry
+	path = include/geometry
 	url = https://github.com/superjax/geometry.git

@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "types.hpp"
-#include "params.hpp"
-#include "drone.hpp"
-#include "controller.hpp"
+#include "dynamics/types.hpp"
+#include "dynamics/params.hpp"
+#include "dynamics/drone.hpp"
+#include "dynamics/controller.hpp"
 
 template <typename Derived>
 bool expectEigenNear(const Eigen::MatrixBase<Derived> &mat1,const Eigen::MatrixBase<Derived> &mat2,double delta)

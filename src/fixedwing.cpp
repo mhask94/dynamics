@@ -1,4 +1,4 @@
-#include "fixedwing.hpp"
+#include "dynamics/fixedwing.hpp"
 
 FixedWing::FixedWing(dyn::params_t params)
 {

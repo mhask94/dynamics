@@ -1,4 +1,4 @@
-﻿#include "controller.hpp"
+﻿#include "dynamics/controller.hpp"
 #include <unsupported/Eigen/MatrixFunctions>
 extern "C"
 {

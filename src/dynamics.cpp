@@ -1,4 +1,4 @@
-#include "dynamics.hpp"
+#include "dynamics/dynamics.hpp"
 
 namespace dyn
 {

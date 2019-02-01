@@ -5,15 +5,15 @@ find_package(Eigen3 REQUIRED)
 find_package(GTest REQUIRED)
 
 if (NOT TARGET geometry)
-    add_subdirectory(lib/geometry)
-    include_directories(lib/geometry/include)
+    add_subdirectory(include/geometry)
+    include_directories(include/geometry/include)
 endif()
 
 set(DYNAMICS_INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIRS}
     include
-    lib/cvxgen
-    lib/geometry/include
+    include/cvxgen
+    include/geometry/include
     )
 
 include_directories(
@@ -25,18 +25,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED 1)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_library(Dynamics STATIC
-    lib/geometry/include/geometry/quat.h
-    lib/cvxgen/solver.h
-    lib/cvxgen/solver.c
-    lib/cvxgen/util.c
-    lib/cvxgen/matrix_support.c
-    lib/cvxgen/ldl.c
-    include/types.hpp
-    include/params.hpp
-    include/fixedwing.hpp
-    include/drone.hpp
-    include/controller.hpp
-    include/dynamics.hpp
+    include/geometry/include/geometry/quat.h
+    include/cvxgen/solver.h
+    include/cvxgen/solver.c
+    include/cvxgen/util.c
+    include/cvxgen/matrix_support.c
+    include/cvxgen/ldl.c
+    include/dynamics/types.hpp
+    include/dynamics/params.hpp
+    include/dynamics/fixedwing.hpp
+    include/dynamics/drone.hpp
+    include/dynamics/controller.hpp
+    include/dynamics/dynamics.hpp
     src/fixedwing.cpp
     src/drone.cpp
     src/controller.cpp

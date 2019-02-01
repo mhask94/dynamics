@@ -1,4 +1,4 @@
-#include "drone.hpp"
+#include "dynamics/drone.hpp"
 #include "geometry/quat.h"
 
 namespace dyn
