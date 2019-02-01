@@ -1,9 +1,9 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
-#include "quat.hpp"
+#include <Eigen/Core>
+#include <Eigen/Dense>
+#include "geometry/quat.h"
 
 namespace dyn
 {

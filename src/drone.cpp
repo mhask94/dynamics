@@ -1,5 +1,5 @@
 #include "drone.hpp"
-#include "quat.hpp"
+#include "geometry/quat.h"
 
 namespace dyn
 {

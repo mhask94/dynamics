@@ -4,10 +4,16 @@ project(DynamicsLib)
 find_package(Eigen3 REQUIRED)
 find_package(GTest REQUIRED)
 
+if (NOT TARGET geometry)
+    add_subdirectory(lib/geometry)
+    include_directories(lib/geometry/include)
+endif()
+
 include_directories(
     ${EIGEN3_INCLUDE_DIRS}
     include
-    include/3rd_party
+    lib/cvxgen
+    lib/geometry/include
     )
 
 set(CMAKE_CXX_STANDARD 11)
@@ -15,12 +21,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED 1)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_library(Dynamics STATIC
-    include/3rd_party/quat.hpp
-    include/3rd_party/solver.h
-    include/3rd_party/solver.c
-    include/3rd_party/util.c
-    include/3rd_party/matrix_support.c
-    include/3rd_party/ldl.c
+    lib/geometry/include/geometry/quat.h
+    lib/cvxgen/solver.h
+    lib/cvxgen/solver.c
+    lib/cvxgen/util.c
+    lib/cvxgen/matrix_support.c
+    lib/cvxgen/ldl.c
     include/types.hpp
     include/params.hpp
     include/fixedwing.hpp

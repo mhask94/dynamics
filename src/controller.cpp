@@ -4,12 +4,12 @@ extern "C"
 {
 #include "solver.h"
 }
-// These global variables are required for 3rd party code
+// These global variables are required for CVXGEN code
 Vars vars;
 Params params;
 Workspace work;
 Settings settings;
-// End of global variables for 3rd party code
+// End of global variables for CVXGEN code
 
 namespace dyn
 {
