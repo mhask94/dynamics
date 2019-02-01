@@ -43,7 +43,7 @@ if (${GTEST_FOUND})
         include_directories(include ${GTEST_INCLUDE_DIRS})
         set(TEST_NAME ${PROJECT_NAME}_UnitTest)
         add_executable(${TEST_NAME}
-            src/dynamics_unittests.cpp
+            test/dynamics_unittests.cpp
             )
         target_link_libraries(${TEST_NAME}
             ${GTEST_LIBRARIES}
