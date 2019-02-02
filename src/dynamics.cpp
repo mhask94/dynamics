@@ -51,9 +51,9 @@ void Dynamics::resetStates()
 
 void Dynamics::derivatives(const State& x,const Wrench& u,ErrorState& k)
 {
-    k.p = x.q.rota(x.v);
+    k.p  = x.q.rota(x.v);
     k.q = x.w;
-    k.v = x.v.cross(x.w) + x.q.rotp(quat::e3*m_p.grav) - (u.f + m_p.mu*x.v)/m_p.mass;
+    k.v = x.v.cross(x.w) + x.q.rotp(quat::e3*m_p.grav) + (u.f + m_p.mu*x.v)/m_p.mass;
     k.w = m_p.inertia_inv*(u.tau - x.w.cross(m_p.inertia*x.w));
 }
 } // end namespace dyn
