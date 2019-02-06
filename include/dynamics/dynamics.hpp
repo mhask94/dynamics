@@ -13,10 +13,10 @@ public:
     virtual ~Dynamics();
     void updateDynamics(const Wrench& inputs);
     State getStates() const;
-    Input getEquilibriumInputs() const;
+//    Input getEquilibriumInputs() const;
     double getDt(const bool milli=true) const;
     void setDt(const double dt);
-    void resetStates();
+    virtual void resetStates();
 
 protected:
     void derivatives(const State& states,const Wrench& inputs,ErrorState& k);
@@ -30,7 +30,7 @@ protected:
         double dt;
     } rk4_t;
 
-    params_t m_p;
+    params_t m_params;
     double m_mass;
     State m_states;
     rk4_t m_rk4;

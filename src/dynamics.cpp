@@ -24,11 +24,11 @@ State Dynamics::getStates() const
     return m_states;
 }
 
-Input Dynamics::getEquilibriumInputs() const
-{
-    Input out;
-    return out;
-}
+//Input Dynamics::getEquilibriumInputs() const
+//{
+//    Input out;
+//    return out;
+//}
 
 double Dynamics::getDt(const bool milli) const
 {
@@ -53,7 +53,7 @@ void Dynamics::derivatives(const State& x,const Wrench& u,ErrorState& k)
 {
     k.p  = x.q.rota(x.v);
     k.q = x.w;
-    k.v = x.v.cross(x.w) + x.q.rotp(quat::e3*m_p.grav) + (u.f + m_p.mu*x.v)/m_p.mass;
-    k.w = m_p.inertia_inv*(u.tau - x.w.cross(m_p.inertia*x.w));
+    k.v = x.v.cross(x.w) + x.q.rotp(quat::e3*m_params.grav) + u.f/m_params.mass;
+    k.w = m_params.inertia_inv*(u.tau - x.w.cross(m_params.inertia*x.w));
 }
 } // end namespace dyn

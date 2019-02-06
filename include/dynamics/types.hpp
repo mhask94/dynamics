@@ -152,22 +152,19 @@ struct Wrench
     }
 };
 
-struct Input
+struct Wind
 {
     enum
     {
-        SIZE = 4
+        SIZE = 6
     };
-
     Eigen::Matrix<double,SIZE,1> vec;
-    double& T;
-    Eigen::Map<Eigen::Vector3d> tau;
-    Eigen::Map<Eigen::Vector3d> del;
+    Eigen::Map<Eigen::Vector3d> ss;
+    Eigen::Map<Eigen::Vector3d> gust;
 
-    Input():
-        T{*vec.data()},
-        tau{vec.data()+1},
-        del{vec.data()+1}
+    Wind() :
+        ss{vec.data()},
+        gust{vec.data()+3}
     {
         vec.setZero();
     }
@@ -220,35 +217,7 @@ typedef struct
     Eigen::Matrix3d inertia_inv;
     Eigen::Matrix3d inertia;
     double grav{9.80655};
-    double mu;
 } params_t;
-
-//typedef struct
-//{
-//    const double center_mass{2.0};
-//    const double prop_mass{0.25};
-//    const double mass{center_mass+4*prop_mass};
-//    const double arm_len{0.3};
-//    const double est_radius{0.1};
-//    const double inertia_x{0.4*center_mass*est_radius*est_radius+2*prop_mass*arm_len*arm_len};
-//    const double inertia_y{inertia_x};
-//    const double inertia_z{0.4*center_mass*est_radius*est_radius+4*prop_mass*arm_len*arm_len};
-//    Eigen::Matrix3d inertia_inv{Eigen::Vector3d(1/inertia_x,1/inertia_y,1/inertia_z).asDiagonal()};
-//    Eigen::Matrix3d inertia{Eigen::Vector3d(inertia_x,inertia_y,inertia_z).asDiagonal()};
-//    const double grav{9.81};
-//    const double mu{0.1};
-//    const double throttle_eq{0.55};
-//    uVec u_eq{throttle_eq,throttle_eq,throttle_eq,throttle_eq};
-//    const double k1{mass*grav/(4*throttle_eq)};
-//    const double k2{0.2};
-//    Eigen::Matrix4d mixer;
-//    Eigen::ColPivHouseholderQR<Eigen::Matrix4d> mixer_qr{4,4};
-//    void setMixer()
-//    {
-//        mixer << k1,k1,k1,k1, 0,-arm_len*k1,0,arm_len*k1, arm_len*k1,0,-arm_len*k1,0, -k2, k2, -k2, k2;
-//        mixer_qr.compute(mixer);
-//    }
-//} params_t; //TODO can give a better name
 
 } // end namespace dyn
 

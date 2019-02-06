@@ -37,10 +37,13 @@ add_library(Dynamics STATIC
     include/dynamics/drone.hpp
     include/dynamics/controller.hpp
     include/dynamics/dynamics.hpp
+    include/dynamics/input.hpp
+    include/dynamics/winddynamics.hpp
     src/fixedwing.cpp
     src/drone.cpp
     src/controller.cpp
     src/dynamics.cpp
+    src/winddynamics.cpp
     )
 
 if (${GTEST_FOUND})
