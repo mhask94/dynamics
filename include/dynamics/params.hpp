@@ -62,7 +62,7 @@ struct Params
     double e{0.9};
     double AR{b*b/S_wing};
     //longitudinal coefficients
-    double C_L_0{0.28};
+    double C_L_0{0.23};
     double C_L_alpha{5.61};
     double C_L_q{7.95};
     double C_L_de{0.13};
@@ -89,14 +89,14 @@ struct Params
     double C_l_beta{-0.13};
     double C_l_p{-0.51};
     double C_l_r{0.25};
-    double C_l_da{-0.011};
+    double C_l_da{0.17};
     double C_l_dr{0.0024};
 
     double C_n_0{0.0};
     double C_n_beta{0.073};
     double C_n_p{0.069};
     double C_n_r{-0.095};
-    double C_n_da{0.06};
+    double C_n_da{-0.011};
     double C_n_dr{-0.069};
 
 //    double C_prop{1.0};
@@ -106,11 +106,11 @@ struct Params
     // prop/motor coefficients
     double D_prop{20*0.0254};
     double K_V{145.0};
-    double KQ{1/K_V * 60/(2*3.14159)};
+    double KQ{(1/K_V) * 60/(2*3.14159)};
     double R_motor{0.042};
     double i0{1.5};
     int nCells{12};
-    double V_max{3.7*nCells};
+    double V_max{4.0*nCells};
     double C_Q2{-0.01664};
     double C_Q1{0.004970};
     double C_Q0{0.005230};
