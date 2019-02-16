@@ -47,6 +47,13 @@ void FixedWing::setWindGust(const Eigen::Vector3d& wind)
     m_wind_gust = wind;
 }
 
+fixedwing::Input FixedWing::getEquilibriumInputs() const
+{
+    fixedwing::Input eq_input;
+    eq_input.vec << -0.124778073, 0.676752115, 1.83617600e-03, -3.02606668e-04;
+    return eq_input;
+}
+
 void FixedWing::updateVelData()
 {
     Eigen::Vector3d Vw_body;
@@ -120,7 +127,7 @@ void FixedWing::calcMotorDyn(double dt,dyn::Wrench &f_tau)
     double Q_p{m_p.rho * n*n * std::pow(m_p.D_prop,5) * C_Q};
 
     f_tau.f(0) += T_p;
-    f_tau.tau(0) += Q_p;
+    f_tau.tau(0) -= Q_p;
 }
 
 void FixedWing::resetStates()

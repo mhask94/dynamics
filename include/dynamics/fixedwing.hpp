@@ -35,6 +35,7 @@ public:
     void setWindSS(const Eigen::Vector3d& wind);
     void setWindGust(const Eigen::Vector3d& wind);
     void resetStates();
+    fixedwing::Input getEquilibriumInputs() const;
 
 protected:
     void updateVelData();

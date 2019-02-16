@@ -33,6 +33,11 @@ struct Input
         vec = d.vec;
         return *this;
     }
+
+    void operator +=(const Input& d)
+    {
+        vec += d.vec;
+    }
 };
 
 } //end namespace fixedwing
