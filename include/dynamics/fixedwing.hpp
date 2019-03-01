@@ -10,6 +10,7 @@ namespace fixedwing
 
 struct State
 {
+    dyn::State dyn;
     double Va;
     double alpha{0};
     double beta{0};
@@ -35,6 +36,7 @@ public:
     void setWindSS(const Eigen::Vector3d& wind);
     void setWindGust(const Eigen::Vector3d& wind);
     void resetStates();
+    fixedwing::State getFixedwingStates() const;
     fixedwing::Input getEquilibriumInputs() const;
 
 protected:

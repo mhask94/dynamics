@@ -13,6 +13,7 @@ FixedWing::FixedWing(int vehicle_type) :
     m_states.p(2) = -20;
     m_states.v(0) = 25;
     m_x.Va = m_states.v.norm();
+    m_x.dyn = m_states;
 //    m_params.grav = 0;
 }
 
@@ -23,6 +24,7 @@ void FixedWing::sendWrench(const dyn::Wrench& inputs)
 {
     this->updateDynamics(inputs);
     this->updateVelData();
+    m_x.dyn = m_states;
 }
 
 void FixedWing::sendDeltas(const fixedwing::Input &deltas)
@@ -45,6 +47,11 @@ void FixedWing::setWindSS(const Eigen::Vector3d& wind)
 void FixedWing::setWindGust(const Eigen::Vector3d& wind)
 {
     m_wind_gust = wind;
+}
+
+fixedwing::State FixedWing::getFixedwingStates() const
+{
+    return m_x;
 }
 
 fixedwing::Input FixedWing::getEquilibriumInputs() const
