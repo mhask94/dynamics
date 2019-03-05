@@ -2,19 +2,18 @@
 #include <math.h>
 
 FixedWing::FixedWing(int vehicle_type) :
-    m_vehicle_type{vehicle_type}
+    m_vehicle_type{vehicle_type},
+    m_use_gust{false}
 {
     m_params = m_p.dyn;
     m_rk4.dt = 0.002;
     m_x.wn = 0.0;
     m_x.we = 0.0;
     m_wind_ss << m_x.wn, m_x.we, 0.0;
-    m_wind_gust.setZero();
     m_states.p(2) = -20;
     m_states.v(0) = 25;
     m_x.Va = m_states.v.norm();
     m_x.dyn = m_states;
-//    m_params.grav = 0;
 }
 
 FixedWing::~FixedWing()
@@ -44,9 +43,9 @@ void FixedWing::setWindSS(const Eigen::Vector3d& wind)
     m_wind_ss = wind;
 }
 
-void FixedWing::setWindGust(const Eigen::Vector3d& wind)
+void FixedWing::setUseGust(const bool use_gust)
 {
-    m_wind_gust = wind;
+    m_use_gust = use_gust;
 }
 
 fixedwing::State FixedWing::getFixedwingStates() const
@@ -64,7 +63,12 @@ fixedwing::Input FixedWing::getEquilibriumInputs() const
 void FixedWing::updateVelData()
 {
     Eigen::Vector3d Vw_body;
-    Vw_body = m_states.q.rotp(m_wind_ss) + m_wind_gust;
+    Eigen::Vector3d wind_gust;
+    if (m_use_gust)
+        wind_gust = m_wind_gust.update(m_x.Va);
+    else
+        wind_gust.setZero();
+    Vw_body = m_states.q.rotp(m_wind_ss) + wind_gust;
 
     Eigen::Vector3d Va_body;
     Va_body = m_states.v - Vw_body;

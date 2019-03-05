@@ -4,6 +4,7 @@
 #include "dynamics.hpp"
 #include "params.hpp"
 #include "input.hpp"
+#include "dynamics/winddynamics.hpp"
 
 namespace fixedwing
 {
@@ -34,7 +35,7 @@ public:
     void sendWrench(const dyn::Wrench& inputs);
     void sendDeltas(const fixedwing::Input& deltas);
     void setWindSS(const Eigen::Vector3d& wind);
-    void setWindGust(const Eigen::Vector3d& wind);
+    void setUseGust(const bool use_gust);
     void resetStates();
     fixedwing::State getFixedwingStates() const;
     fixedwing::Input getEquilibriumInputs() const;
@@ -50,7 +51,8 @@ private:
     fixedwing::Params m_p;
     fixedwing::State m_x;
     Eigen::Vector3d m_wind_ss;
-    Eigen::Vector3d m_wind_gust;
+    dyn::WindDynamics m_wind_gust;
+    bool m_use_gust;
 };
 
 #endif // FIXEDWING_HPP

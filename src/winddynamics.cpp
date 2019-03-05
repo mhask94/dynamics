@@ -2,6 +2,9 @@
 #include "math.h"
 #include <random>
 
+namespace dyn
+{
+
 WindDynamics::WindDynamics() :
     m_Lu{200},
     m_Lv{m_Lu},
@@ -15,7 +18,6 @@ WindDynamics::WindDynamics() :
     m_B << 1,0,0, 0,1,0, 0,0,0, 0,0,1, 0,0,0;
     m_C << 1,0,0,0,0, 0,1,1,0,0, 0,0,0,1,1;
     m_x.setZero();
-//    m_y.setZero();
 }
 
 Eigen::Vector3d WindDynamics::update(const double Va)
@@ -51,3 +53,5 @@ double WindDynamics::getRandGaussian()
     std::normal_distribution<> dis{mean, std_dev};
     return dis(gen);
 }
+
+} // end namespace dyn

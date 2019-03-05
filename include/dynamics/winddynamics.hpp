@@ -3,6 +3,9 @@
 
 #include <Eigen/Core>
 
+namespace dyn
+{
+
 class WindDynamics
 {
 public:
@@ -25,7 +28,8 @@ private:
     Eigen::Matrix<double,5,3> m_B;
     Eigen::Matrix<double,3,5> m_C;
     Eigen::Matrix<double,5,1> m_x;
-//    Eigen::Vector3d m_y;
 };
+
+} // end namespace dyn
 
 #endif // WINDDYNAMICS_HPP
