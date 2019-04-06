@@ -10,7 +10,7 @@ FixedWing::FixedWing(int vehicle_type) :
     m_x.wn = 0.0;
     m_x.we = 0.0;
     m_wind_ss << m_x.wn, m_x.we, 0.0;
-    m_states.p(2) = -20;
+    m_states.p(2) = -50;
     m_states.v(0) = 25;
     m_x.Va = m_states.v.norm();
     m_x.dyn = m_states;
