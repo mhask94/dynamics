@@ -142,4 +142,26 @@ enum
 
 } // end namespace fixedwing
 
+namespace sensor
+{
+    struct Params
+    {
+        double accel_sigma{0.0025*9.80665};
+        double gyro_sigma{0.13*3.14159/180.0};
+        double gyro_bias_x{0};
+        double gyro_bias_y{0};
+        double gyro_bias_z{0};
+        double static_pres_sigma{0.01*1000};
+        double diff_pres_sigma{0.002*1000};
+        double gps_ts{1.0};
+        double gps_beta{1.0/1100.0};
+        double gps_sigma_n{0.21};
+        double gps_sigma_e{0.21};
+        double gps_sigma_h{0.4};
+        double gps_sigma_Vg{0.05};
+        double gps_sigma_chi{gps_sigma_Vg/10.0};
+    };
+
+} // end namespace sensor
+
 #endif // PARAMS_HPP

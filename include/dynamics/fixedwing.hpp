@@ -25,6 +25,23 @@ struct State
     double bz{0};
 };
 
+struct Sensors
+{
+    double gyro_x{0};
+    double gyro_y{0};
+    double gyro_z{0};
+    double accel_x{0};
+    double accel_y{0};
+    double accel_z{0};
+    double static_pressure{0};
+    double diff_pressure{0};
+    double gps_n{0};
+    double gps_e{0};
+    double gps_h{0};
+    double gps_Vg{0};
+    double gps_chi{0};
+};
+
 } //end namespace fixedwing
 
 class FixedWing : public dyn::Dynamics
@@ -42,6 +59,8 @@ public:
 
 protected:
     void updateVelData();
+    void updateFixedwingState();
+    void updateSensors();
     void calcLonDyn(double pVa2S_2,double de,dyn::Wrench& f_tau);
     void calcLatDyn(double pVa2S_2,double da,double dr,dyn::Wrench& f_tau);
     void calcMotorDyn(double dt,dyn::Wrench& f_tau);
@@ -50,6 +69,15 @@ private:
     int m_vehicle_type;
     fixedwing::Params m_p;
     fixedwing::State m_x;
+    fixedwing::Sensors m_sensors;
+    double m_fx;
+    double m_fy;
+    double m_fz;
+    double m_t_gps;
+    double m_gps_eta_n;
+    double m_gps_eta_e;
+    double m_gps_eta_h;
+    sensor::Params m_sensor_p;
     Eigen::Vector3d m_wind_ss;
     dyn::WindDynamics m_wind_gust;
     bool m_use_gust;

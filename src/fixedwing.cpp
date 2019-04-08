@@ -1,8 +1,22 @@
 #include "dynamics/fixedwing.hpp"
 #include <math.h>
+#include <random>
+
+double rand(double mean, double sigma)
+{
+    static std::default_random_engine eng;
+    static std::normal_distribution<double> dist{0,1};
+    double random_num{dist(eng)};
+
+    return mean + sigma*random_num;
+}
 
 FixedWing::FixedWing(int vehicle_type) :
     m_vehicle_type{vehicle_type},
+    m_t_gps{999},
+    m_gps_eta_n{0},
+    m_gps_eta_e{0},
+    m_gps_eta_h{0},
     m_use_gust{false}
 {
     m_params = m_p.dyn;
@@ -14,6 +28,10 @@ FixedWing::FixedWing(int vehicle_type) :
     m_states.v(0) = 25;
     m_x.Va = m_states.v.norm();
     m_x.dyn = m_states;
+
+    double test1 = rand(5, 0.5);
+    double test2 = rand(2, 0.1);
+    double test3 = rand(-10, 1.0);
 }
 
 FixedWing::~FixedWing()
@@ -23,7 +41,8 @@ void FixedWing::sendWrench(const dyn::Wrench& inputs)
 {
     this->updateDynamics(inputs);
     this->updateVelData();
-    m_x.dyn = m_states;
+    this->updateFixedwingState();
+    this->updateSensors();
 }
 
 void FixedWing::sendDeltas(const fixedwing::Input &deltas)
@@ -34,6 +53,10 @@ void FixedWing::sendDeltas(const fixedwing::Input &deltas)
     this->calcLonDyn(pVa2S_2,deltas.de,inputs);
     this->calcLatDyn(pVa2S_2,deltas.da,deltas.dr,inputs);
     this->calcMotorDyn(deltas.dt,inputs);
+
+    m_fx = inputs.f(0);
+    m_fy = inputs.f(1);
+    m_fz = inputs.f(2);
 
     this->sendWrench(inputs);
 }
@@ -73,9 +96,57 @@ void FixedWing::updateVelData()
     Eigen::Vector3d Va_body;
     Va_body = m_states.v - Vw_body;
 
+    m_x.wn = Vw_body(0);
+    m_x.we = Vw_body(1);
     m_x.Va = Va_body.norm();
-    m_x.alpha = std::atan2(Va_body(2),Va_body(0));
-    m_x.beta = std::asin(Va_body(1)/m_x.Va);
+    if (Va_body(0) == 0.0)
+        m_x.alpha = (Va_body(2) > 0) ? 3.14159/2.0 : -3.14159/2.0;
+    else
+        m_x.alpha = std::atan2(Va_body(2),Va_body(0));
+    if (Va_body(0) == 0.0 && Va_body(2) == 0.0)
+        m_x.beta = (Va_body(1) > 0) ? 3.14159/2.0 : -3.14159/2.0;
+    else
+        m_x.beta = std::asin(Va_body(1)/m_x.Va);
+}
+
+void FixedWing::updateFixedwingState()
+{
+    m_x.dyn = m_states;
+    Eigen::Vector3d Vg_i{m_states.q.rota(m_states.v)};
+    m_x.Vg = Vg_i.norm();
+    m_x.gamma = asin(-Vg_i(2) / m_x.Vg);
+    m_x.chi = atan2(Vg_i(1), Vg_i(0));
+}
+
+void FixedWing::updateSensors()
+{
+    m_sensors.gyro_x = m_states.w(0) + rand(m_sensor_p.gyro_bias_x,m_sensor_p.gyro_sigma);
+    m_sensors.gyro_y = m_states.w(1) + rand(m_sensor_p.gyro_bias_y,m_sensor_p.gyro_sigma);
+    m_sensors.gyro_z = m_states.w(2) + rand(m_sensor_p.gyro_bias_z,m_sensor_p.gyro_sigma);
+    m_sensors.accel_x = rand(m_fx, m_sensor_p.accel_sigma);
+    m_sensors.accel_y = rand(m_fy, m_sensor_p.accel_sigma);
+    m_sensors.accel_z = rand(m_fz, m_sensor_p.accel_sigma);
+    double pgh{m_p.rho*m_params.grav*-m_states.p(2)};
+    double pressure_bias{0};
+    m_sensors.static_pressure = pgh + rand(pressure_bias,m_sensor_p.static_pres_sigma);
+    double pVa2_2{0.5*m_p.rho*m_x.Va*m_x.Va};
+    m_sensors.diff_pressure = pVa2_2 + rand(pressure_bias,m_sensor_p.diff_pres_sigma);
+
+    if (m_t_gps >= m_sensor_p.gps_ts)
+    {
+        double C_gps{exp(-m_sensor_p.gps_beta*m_sensor_p.gps_ts)};
+        m_gps_eta_n = rand(C_gps*m_gps_eta_n,m_sensor_p.gps_sigma_n);
+        m_gps_eta_e = rand(C_gps*m_gps_eta_e,m_sensor_p.gps_sigma_e);
+        m_gps_eta_h = rand(C_gps*m_gps_eta_h,m_sensor_p.gps_sigma_h);
+        m_sensors.gps_n = m_states.p(0) + m_gps_eta_n;
+        m_sensors.gps_e = m_states.p(1) + m_gps_eta_e;
+        m_sensors.gps_h = -m_states.p(2) + m_gps_eta_h;
+        m_sensors.gps_Vg = rand(m_x.Vg, m_sensor_p.gps_sigma_Vg);
+        m_sensors.gps_chi = rand(m_x.chi, m_sensor_p.gps_sigma_chi);
+        m_t_gps = 0;
+    }
+    else
+        m_t_gps += m_rk4.dt;
 }
 
 void FixedWing::calcLonDyn(double pVa2S_2,double de,dyn::Wrench& f_tau)
