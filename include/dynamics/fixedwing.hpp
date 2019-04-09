@@ -55,6 +55,7 @@ public:
     void setUseGust(const bool use_gust);
     void resetStates();
     fixedwing::State getFixedwingStates() const;
+    fixedwing::Sensors getSensorData() const;
     fixedwing::Input getEquilibriumInputs() const;
 
 protected:

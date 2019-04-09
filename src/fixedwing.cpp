@@ -24,14 +24,7 @@ FixedWing::FixedWing(int vehicle_type) :
     m_x.wn = 0.0;
     m_x.we = 0.0;
     m_wind_ss << m_x.wn, m_x.we, 0.0;
-    m_states.p(2) = -50;
-    m_states.v(0) = 25;
-    m_x.Va = m_states.v.norm();
-    m_x.dyn = m_states;
-
-    double test1 = rand(5, 0.5);
-    double test2 = rand(2, 0.1);
-    double test3 = rand(-10, 1.0);
+    resetStates();
 }
 
 FixedWing::~FixedWing()
@@ -74,6 +67,11 @@ void FixedWing::setUseGust(const bool use_gust)
 fixedwing::State FixedWing::getFixedwingStates() const
 {
     return m_x;
+}
+
+fixedwing::Sensors FixedWing::getSensorData() const
+{
+    return m_sensors;
 }
 
 fixedwing::Input FixedWing::getEquilibriumInputs() const
@@ -216,7 +214,8 @@ void FixedWing::resetStates()
 {
     m_states.vec.setZero();
     m_states.q = quat::Quatd::Identity();
-    m_states.p(2) = -20;
+    m_states.p(2) = -50;
     m_states.v(0) = 25;
     m_x.Va = m_states.v.norm();
+    m_x.dyn = m_states;
 }
