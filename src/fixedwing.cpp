@@ -121,9 +121,9 @@ void FixedWing::updateSensors()
     m_sensors.gyro_x = m_states.w(0) + rand(m_sensor_p.gyro_bias_x,m_sensor_p.gyro_sigma);
     m_sensors.gyro_y = m_states.w(1) + rand(m_sensor_p.gyro_bias_y,m_sensor_p.gyro_sigma);
     m_sensors.gyro_z = m_states.w(2) + rand(m_sensor_p.gyro_bias_z,m_sensor_p.gyro_sigma);
-    m_sensors.accel_x = rand(m_fx, m_sensor_p.accel_sigma);
-    m_sensors.accel_y = rand(m_fy, m_sensor_p.accel_sigma);
-    m_sensors.accel_z = rand(m_fz, m_sensor_p.accel_sigma);
+    m_sensors.accel_x = rand(m_fx/m_params.mass, m_sensor_p.accel_sigma);
+    m_sensors.accel_y = rand(m_fy/m_params.mass, m_sensor_p.accel_sigma);
+    m_sensors.accel_z = rand(m_fz/m_params.mass, m_sensor_p.accel_sigma);
     double pgh{m_p.rho*m_params.grav*-m_states.p(2)};
     double pressure_bias{0};
     m_sensors.static_pressure = pgh + rand(pressure_bias,m_sensor_p.static_pres_sigma);
